@@ -1,0 +1,199 @@
+services:
+  backend:
+    image: voloteam/volo:backend
+    platform: linux/amd64
+    build:
+      context: backend
+      dockerfile: Dockerfile.production
+      args:
+        BACKEND_PORT: ${BACKEND_PORT}
+        CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+        CLIENT_URI: ${CLIENT_URI}
+        SERVER_URI: ${SERVER_URI}
+        DATABASE_TYPE: ${DATABASE_TYPE}
+        DATABASE_HOST: ${DATABASE_HOST}
+        DATABASE_USERNAME: ${DATABASE_USERNAME}
+        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+        DATABASE_NAME: ${DATABASE_NAME}
+        DATABASE_PORT: ${DATABASE_PORT}
+        DATABASE_URL: ${DATABASE_URL}
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_KEY: ${SUPABASE_KEY}
+        SUPABASE_BUCKET_NAME: ${SUPABASE_BUCKET_NAME}
+        COOKIE_ACCESS_TOKEN_NAME: ${COOKIE_ACCESS_TOKEN_NAME}
+        COOKIE_REFRESH_TOKEN_NAME: ${COOKIE_REFRESH_TOKEN_NAME}
+        COOKIE_OAUTH2_TOKEN_NAME: ${COOKIE_OAUTH2_TOKEN_NAME}
+        COOKIE_DOMAIN: ${COOKIE_DOMAIN}
+        COOKIE_SECRET: ${COOKIE_SECRET}
+        JWT_SECRET: ${JWT_SECRET}
+        JWT_ACCESS_TOKEN_DURATION: ${JWT_ACCESS_TOKEN_DURATION}
+        JWT_REFRESH_TOKEN_DURATION: ${JWT_REFRESH_TOKEN_DURATION}
+        JWT_OAUTH2_TOKEN_DURATION: ${JWT_OAUTH2_TOKEN_DURATION}
+        JWT_ISSUER: ${JWT_ISSUER}
+        JWT_AUDIENCE: ${JWT_AUDIENCE}
+        USER_PASSWORD_SALT_PREFIX: ${USER_PASSWORD_SALT_PREFIX}
+        USER_PASSWORD_SALT_SUFFIX: ${USER_PASSWORD_SALT_SUFFIX}
+        USER_PASSWORD_SALT_ROUNDS: ${USER_PASSWORD_SALT_ROUNDS}
+        GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+        GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    container_name: volo-backend
+    networks:
+      - volo-network
+    env_file:
+      - ./env/.env.production
+    ports:
+      - 8000:${DOCKER_INTERNAL_BACKEND_PORT}
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma/migrations:/app/prisma/migrations
+      - ./backend/prisma/seeders:/app/prisma/seeders
+    depends_on:
+      database:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    restart: on-failure
+
+  database:
+    image: voloteam/volo:database
+    platform: linux/amd64
+    build:
+      context: backend
+      dockerfile_inline: |
+        FROM postgres:latest
+    container_name: volo-database
+    networks:
+      - volo-network
+    env_file:
+      - ./env/.env.production
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - ${DOCKER_INTERNAL_DATABASE_PORT}
+    expose:
+      - ${DOCKER_INTERNAL_DATABASE_PORT}
+    volumes:
+      - volo-database-volume:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ['CMD-SHELL', "sh -c 'pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: on-failure
+
+  nginx:
+    image: voloteam/volo:nginx
+    platform: linux/amd64
+    build:
+      context: backend
+      dockerfile_inline: |
+        FROM nginx:latest
+    container_name: volo-nginx
+    networks:
+      - volo-network
+    env_file: ./env/.env.production
+    ports:
+      - 80:${DOCKER_INTERNAL_NGINX_PORT}
+      - 443:${DOCKER_INTERNAL_NGINX_SSL_PORT}
+    volumes:
+      - ./backend/nginx/default.production.conf:/etc/nginx/conf.d/default.conf
+      - ./backend/data/certbot/conf:/etc/letsencrypt
+      - ./backend/data/certbot/www:/var/www/certbot
+    expose:
+      - ${DOCKER_INTERNAL_NGINX_PORT}
+      - ${DOCKER_INTERNAL_NGINX_SSL_PORT}
+    depends_on:
+      backend:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ['CMD-SHELL', 'service nginx status || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: on-failure
+
+  certbot:
+    image: voloteam/volo:certbot
+    platform: linux/amd64
+    build:
+      context: backend
+      dockerfile_inline: |
+        FROM certbot/certbot
+    container_name: volo-certbot
+    networks:
+      - volo-network
+    env_file: ./env/.env.production
+    volumes:
+      - ./backend/data/certbot/conf:/etc/letsencrypt
+      - ./backend/data/certbot/www:/var/www/certbot
+    expose:
+      - ${DOCKER_INTERNAL_NGINX_PORT}
+      - ${DOCKER_INTERNAL_NGINX_SSL_PORT}
+    depends_on:
+      nginx:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    entrypoint:
+      "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    restart: on-failure
+
+  frontend:
+    image: voloteam/volo:frontend
+    platform: linux/amd64
+    build:
+      context: frontend
+      dockerfile: Dockerfile.production
+      args:
+        VITE_FRONTEND_PORT: $VITE_FRONTEND_PORT
+        VITE_BACKEND_URI: ${VITE_BACKEND_URI}
+        VITE_BACKEND_PREFIX: ${VITE_BACKEND_PREFIX}
+        VITE_FRONTEND_URI: ${VITE_FRONTEND_URI}
+        VITE_BACKEND_PORT: ${VITE_BACKEND_PORT}
+        VITE_COOKIE_ACCESS_TOKEN_NAME: ${VITE_COOKIE_ACCESS_TOKEN_NAME}
+        VITE_COOKIE_REFRESH_TOKEN_NAME: ${VITE_COOKIE_REFRESH_TOKEN_NAME}
+        VITE_COOKIE_OAUTH2_TOKEN_NAME: ${VITE_COOKIE_OAUTH2_TOKEN_NAME}
+        VITE_COOKIE_DOMAIN: ${VITE_COOKIE_DOMAIN}
+        VITE_COOKIE_SECRET: ${VITE_COOKIE_SECRET}
+        VITE_JWT_SECRET: ${VITE_JWT_SECRET}
+        VITE_JWT_ISSUER: ${VITE_JWT_SECRET}
+        VITE_JWT_AUDIENCE: ${VITE_JWT_AUDIENCE}
+        VITE_NGINX_PORT: ${VITE_NGINX_PORT}
+    container_name: volo-frontend
+    networks:
+      - volo-network
+    env_file:
+      - ./env/.env.production
+    ports:
+      - 3000:${DOCKER_INTERNAL_FRONTEND_PORT}
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      backend:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 1096M
+    restart: on-failure
+
+networks:
+  volo-network:
+    driver: bridge
+
+volumes:
+  volo-database-volume:

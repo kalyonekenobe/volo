@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String    @id @default(uuid()) @db.Uuid
+  email                    String    @unique @db.VarChar(50)
+  password                 String?   @db.Text
+  firstName                String?   @db.VarChar(50)
+  lastName                 String?   @db.VarChar(50)
+  birthDate                DateTime? @db.Timestamptz(6)
+  phone                    String?   @db.VarChar(20)
+  bio                      String?   @db.Text
+  image                    String?   @db.Text
+  userRegistrationMethodId Int       @db.SmallInt
+  userRoleId               Int       @db.SmallInt
+  refreshToken             String?   @db.Text
+  stripeCustomerId         String?   @db.VarChar(255)
+  createdAt                DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime  @updatedAt @db.Timestamptz(6)
+
+  userRegistrationMethod UserRegistrationMethod @relation(fields: [userRegistrationMethodId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  userRole               UserRole               @relation(fields: [userRoleId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  posts                  Post[]
+
+  @@index([email])
+}
+
+model UserRegistrationMethod {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  users User[]
+
+  @@index([name])
+}
+
+model UserRole {
+  id          Int      @id @default(autoincrement()) @db.SmallInt
+  name        String   @unique @db.VarChar(50)
+  permissions BigInt   @default(0) @db.BigInt
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  users User[]
+
+  @@index([name])
+}
+
+model Post {
+  id              String    @id @default(uuid()) @db.Uuid
+  authorId        String    @db.Uuid
+  title           String    @db.VarChar(255)
+  content         String    @db.Text
+  fundsToBeRaised Decimal   @db.Money
+  deadline        DateTime? @db.Timestamptz(6)
+  image           String?   @db.Text
+  isDraft         Boolean   @default(false) @db.Boolean
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
+  removedAt       DateTime? @db.Timestamptz(6)
+
+  author            User             @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  categoriesToPosts CategoryToPost[]
+  postDonations     PostDonation[]
+
+  @@unique([title, authorId])
+  @@index([title])
+}
+
+model PostDonation {
+  id        String    @id @default(uuid()) @db.Uuid
+  postId    String    @db.Uuid
+  donation  Decimal   @db.Money
+  metadata  Json      @default("{}")
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  removedAt DateTime? @db.Timestamptz(6)
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([donation])
+}
+
+model PostCategory {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  categoriesToPosts CategoryToPost[]
+
+  @@index([name])
+}
+
+model CategoryToPost {
+  categoryId Int      @db.SmallInt
+  postId     String   @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  postCategory PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  post         Post         @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([categoryId, postId])
+  @@index([updatedAt])
+}
