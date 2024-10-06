@@ -8,10 +8,16 @@ import { PasswordModuleOptions } from 'src/modules/password/types/password.types
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
 import { SupabaseModule } from 'src/modules/supabase/supabase.module';
 import { SupabaseModuleOptions } from 'src/modules/supabase/types/supabase.types';
+import { UserRegistrationMethodModule } from '../user-registration-method/user-registration-method.module';
+import { UserRoleModule } from '../user-role/user-role.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
     PrismaModule,
+    UserRegistrationMethodModule,
+    UserRoleModule,
+    UserModule,
     ConfigModule.forRoot({
       envFilePath: [],
       isGlobal: true,
