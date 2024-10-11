@@ -1,5 +1,18 @@
 import { User } from '@prisma/client';
-import { IsDate, IsDefined, IsEmail, IsNotEmpty, IsInt, IsPhoneNumber, IsString, IsUUID, MaxDate, MaxLength, MinDate, ValidateIf } from 'class-validator';
+import {
+  IsDate,
+  IsDefined,
+  IsEmail,
+  IsNotEmpty,
+  IsInt,
+  IsPhoneNumber,
+  IsString,
+  IsUUID,
+  MaxDate,
+  MaxLength,
+  MinDate,
+  ValidateIf,
+} from 'class-validator';
 import { PostEntity } from 'src/modules/post/entity/post.entity';
 import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entity/user-registration-method.entity';
 import { UserRoleEntity } from 'src/modules/user-role/entity/user-role.entity';

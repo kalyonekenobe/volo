@@ -1,26 +1,24 @@
-import { Post, PostDonation } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Type } from 'class-transformer';
 import {
   IsUUID,
   IsNotEmpty,
   IsDefined,
+  IsBoolean,
+  IsDate,
+  IsDecimal,
   IsString,
+  MaxDate,
   MaxLength,
   MinLength,
-  IsDecimal,
-  IsDate,
-  MaxDate,
   ValidateIf,
-  IsBoolean,
   MinDate,
 } from 'class-validator';
 
-export class PostEntity implements Post {
-  @IsUUID()
-  @IsNotEmpty()
-  @IsDefined()
-  id: string;
-
+export class CreatePostDto
+  implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'removedAt' | 'image'>
+{
   @IsUUID()
   @IsNotEmpty()
   @IsDefined()
@@ -42,38 +40,17 @@ export class PostEntity implements Post {
 
   @IsDecimal()
   @IsDefined()
+  @Type(() => Decimal)
   fundsToBeRaised: Decimal;
 
   @IsDate()
   @MinDate(new Date())
   @ValidateIf((_, value) => value)
+  @Type(() => Date)
   deadline: Date | null;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(300)
-  @ValidateIf((_, value) => value)
-  image: string | null;
 
   @IsBoolean()
   @IsDefined()
+  @Type(() => Boolean)
   isDraft: boolean;
-
-  @IsDate()
-  @MaxDate(new Date())
-  createdAt: Date;
-
-  @IsDate()
-  @MaxDate(new Date())
-  updatedAt: Date;
-
-  @IsDate()
-  @MaxDate(new Date())
-  @ValidateIf((_, value) => value)
-  removedAt: Date | null;
-
-  @IsDecimal()
-  @IsDefined()
-  currentlyRaisedFunds?: Decimal;
 }
