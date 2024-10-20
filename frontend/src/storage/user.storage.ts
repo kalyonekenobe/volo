@@ -8,7 +8,7 @@ export const fetchAllUsersAtom = atom(
   async (get, set) => {
     try {
       // TODO: send request to the backend
-      // Example: const response = await axios.post('users', data);
+      // Example: const response = await api.post('users', data);
       // set(usersAtom, [...get(usersAtom), response.data]);
 
       // Just for test
@@ -22,7 +22,7 @@ export const fetchAllUsersAtom = atom(
 export const createUserAtom = atom(null, async (get, set, data: CreateUserDto) => {
   try {
     // TODO: send request to the backend
-    // Example: const response = await axios.post('users', data);
+    // Example: const response = await api.post('users', data);
     // set(usersAtom, [...get(usersAtom), response.data]);
 
     // Just for test

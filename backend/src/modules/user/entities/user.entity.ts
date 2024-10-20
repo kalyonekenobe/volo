@@ -13,11 +13,11 @@ import {
   MinDate,
   ValidateIf,
 } from 'class-validator';
-import { PostEntity } from 'src/modules/post/entity/post.entity';
-import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entity/user-registration-method.entity';
-import { UserRoleEntity } from 'src/modules/user-role/entity/user-role.entity';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
+import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entities/user-registration-method.entity';
+import { UserRoleEntity } from 'src/modules/user-role/entities/user-role.entity';
 
-export class UserPublicEntity implements Omit<User, 'password' | 'refreshToken'> {
+export class UserEntity implements User {
   @IsUUID()
   @IsNotEmpty()
   @IsDefined()
@@ -28,6 +28,12 @@ export class UserPublicEntity implements Omit<User, 'password' | 'refreshToken'>
   @MaxLength(50)
   @IsDefined()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(50)
+  @ValidateIf((_, value) => value)
+  password: string | null;
 
   @IsString()
   @MaxLength(50)
@@ -73,6 +79,10 @@ export class UserPublicEntity implements Omit<User, 'password' | 'refreshToken'>
   userRoleId: number;
 
   @IsString()
+  @ValidateIf((_, value) => value)
+  refreshToken: string | null;
+
+  @IsString()
   @MaxLength(255)
   @IsNotEmpty()
   @ValidateIf((_, value) => value)
@@ -88,7 +98,7 @@ export class UserPublicEntity implements Omit<User, 'password' | 'refreshToken'>
   @ValidateIf((_, value) => value)
   updatedAt: Date;
 
-  userRegistrationMethod?: UserRegistrationMethodEntity[];
-  userRole?: UserRoleEntity[];
+  userRegistrationMethod?: UserRegistrationMethodEntity;
+  userRole?: UserRoleEntity;
   posts?: PostEntity[];
 }

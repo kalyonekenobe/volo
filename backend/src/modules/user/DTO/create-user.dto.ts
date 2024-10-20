@@ -1,4 +1,3 @@
-import { User } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
@@ -10,21 +9,14 @@ import {
   IsDate,
   MinDate,
   IsInt,
+  Min,
 } from 'class-validator';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 export class CreateUserDto
   implements
-    Omit<
-      User,
-      | 'id'
-      | 'phone'
-      | 'bio'
-      | 'image'
-      | 'refreshToken'
-      | 'stripeCustomerId'
-      | 'createdAt'
-      | 'updatedAt'
-    >
+    Pick<UserEntity, 'email' | 'userRegistrationMethodId' | 'userRoleId'>,
+    Pick<Partial<UserEntity>, 'password' | 'firstName' | 'lastName' | 'birthDate'>
 {
   @IsEmail()
   @IsNotEmpty()
@@ -35,34 +27,36 @@ export class CreateUserDto
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  @IsDefined()
-  password: string;
+  @ValidateIf((_, value) => value)
+  password?: string | null;
 
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
   @ValidateIf((_, value) => value)
-  firstName: string | null;
+  firstName?: string | null;
 
   @IsString()
   @MaxLength(50)
   @IsNotEmpty()
   @ValidateIf((_, value) => value)
-  lastName: string | null;
+  lastName?: string | null;
 
+  @Type(() => Date)
   @IsDate()
   @MinDate(new Date(new Date().setFullYear(new Date().getFullYear() - 6)))
   @ValidateIf((_, value) => value)
-  @Type(() => Date)
-  birthDate: Date | null;
+  birthDate?: Date | null;
 
+  @Min(1)
   @IsInt()
-  @IsDefined()
   @Type(() => Number)
+  @IsDefined()
   userRegistrationMethodId: number;
 
+  @Min(1)
   @IsInt()
-  @IsDefined()
   @Type(() => Number)
+  @IsDefined()
   userRoleId: number;
 }

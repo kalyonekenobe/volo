@@ -1,4 +1,4 @@
-import { Post, PostDonation } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import {
   IsUUID,
@@ -14,6 +14,7 @@ import {
   IsBoolean,
   MinDate,
 } from 'class-validator';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 export class PostEntity implements Post {
   @IsUUID()
@@ -76,4 +77,6 @@ export class PostEntity implements Post {
   @IsDecimal()
   @IsDefined()
   currentlyRaisedFunds?: Decimal;
+
+  author?: UserPublicEntity;
 }
