@@ -39,4 +39,5 @@ export enum Routes {
   UserRoles = 'user-roles',
   Auth = 'auth',
   OAuth2 = 'oauth2',
+  Posts = 'posts',
 }

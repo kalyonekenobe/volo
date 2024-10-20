@@ -8,6 +8,7 @@ import { PasswordModuleOptions } from 'src/modules/password/types/password.types
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
 import { SupabaseModule } from 'src/modules/supabase/supabase.module';
 import { SupabaseModuleOptions } from 'src/modules/supabase/types/supabase.types';
+import { PostModule } from '../post/post.module';
 import { UserRegistrationMethodModule } from '../user-registration-method/user-registration-method.module';
 import { UserRoleModule } from '../user-role/user-role.module';
 import { UserModule } from '../user/user.module';
@@ -18,6 +19,7 @@ import { UserModule } from '../user/user.module';
     UserRegistrationMethodModule,
     UserRoleModule,
     UserModule,
+    PostModule,
     ConfigModule.forRoot({
       envFilePath: [],
       isGlobal: true,
