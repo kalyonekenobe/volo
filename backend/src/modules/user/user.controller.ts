@@ -7,10 +7,10 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UploadResourceTypes } from 'src/core/constants/constants';
 import { UploadRestrictions } from 'src/core/decorators/upload-restrictions.decorator';
 import { Routes } from 'src/core/enums/app.enums';
@@ -20,6 +20,10 @@ import { UserPublicEntity } from './entities/user-public.entity';
 import { UserService } from './user.service';
 import { deserializeQueryString } from 'src/core/utils/url.utils';
 import * as _ from 'lodash';
+import {
+  CreateUserUploadedFiles,
+  UpdateUserUploadedFiles,
+} from 'src/modules/user/types/user.types';
 
 @Controller(Routes.Users)
 export class UserController {
@@ -36,40 +40,40 @@ export class UserController {
   }
 
   @Post()
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   public async create(
     @Body() createUserDto: CreateUserDto,
-    @UploadedFile()
+    @UploadedFiles()
     @UploadRestrictions([
       {
-        fieldname: 'avatar',
+        fieldname: 'image',
         minFileSize: 1,
         maxFileSize: 1024 * 1024 * 5,
         allowedMimeTypes: UploadResourceTypes.IMAGE,
       },
     ])
-    avatar?: Express.Multer.File,
+    files?: CreateUserUploadedFiles,
   ): Promise<UserPublicEntity> {
-    return this.userService.create(createUserDto, avatar);
+    return this.userService.create(createUserDto, files);
   }
 
   @Put(':id')
-  @UseInterceptors(FileInterceptor('avatar'))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   public async update(
     @Param('id') id: UserPublicEntity['id'],
     @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile()
+    @UploadedFiles()
     @UploadRestrictions([
       {
-        fieldname: 'avatar',
+        fieldname: 'image',
         minFileSize: 1,
         maxFileSize: 1024 * 1024 * 5,
         allowedMimeTypes: UploadResourceTypes.IMAGE,
       },
     ])
-    avatar?: Express.Multer.File,
+    files?: UpdateUserUploadedFiles,
   ): Promise<UserPublicEntity> {
-    return this.userService.update(id, updateUserDto, avatar);
+    return this.userService.update(id, updateUserDto, files);
   }
 
   @Delete(':id')

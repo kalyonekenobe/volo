@@ -50,11 +50,13 @@ export class CreateUserDto
 
   @Min(1)
   @IsInt()
+  @Type(() => Number)
   @IsDefined()
   userRegistrationMethodId: number;
 
   @Min(1)
   @IsInt()
+  @Type(() => Number)
   @IsDefined()
   userRoleId: number;
 }

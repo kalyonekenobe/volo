@@ -6,8 +6,6 @@ import {
   IsDate,
   IsDecimal,
   IsString,
-  MaxLength,
-  MinLength,
   ValidateIf,
   MinDate,
 } from 'class-validator';
@@ -22,15 +20,11 @@ export class UpdatePostDto
 {
   @IsString()
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(100)
   @ValidateIf((_, value) => value)
   title?: string;
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(300)
   @ValidateIf((_, value) => value)
   content?: string;
 
@@ -47,8 +41,6 @@ export class UpdatePostDto
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(3)
-  @MaxLength(300)
   @ValidateIf((_, value) => value)
   image?: string | null;
 

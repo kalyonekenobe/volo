@@ -10,6 +10,7 @@ import { UpdatePostDto } from './DTO/update-post.dto';
 import { PostEntity } from './entities/post.entity';
 import * as path from 'path';
 import { Prisma } from '@prisma/client';
+import { CreatePostRequestFiles, UpdatePostRequestFiles } from 'src/modules/post/types/post.types';
 
 @Injectable()
 export class PostService {
@@ -36,12 +37,13 @@ export class PostService {
       .then(post => this.calculateRaisedFundsForPost(post));
   }
 
-  public async create(data: CreatePostDto, avatar?: Express.Multer.File): Promise<PostEntity> {
+  public async create(data: CreatePostDto, files?: CreatePostRequestFiles): Promise<PostEntity> {
     return this.prismaService.post.create({ data }).then(post => {
-      if (avatar) {
-        const filename = `${Routes.Posts}/${uuid()}${path.extname(avatar.originalname)}`;
+      if (files?.image?.length) {
+        const image = files?.image[0];
+        const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
 
-        this.supabaseService.upload(avatar, filename).then(async response => {
+        this.supabaseService.upload(image, filename).then(async response => {
           if (response.file.filename) {
             await this.prismaService.post.update({
               where: { id: post.id },
@@ -58,13 +60,15 @@ export class PostService {
   public async update(
     id: PostEntity['id'],
     data: UpdatePostDto,
-    avatar?: Express.Multer.File,
+    files?: UpdatePostRequestFiles,
   ): Promise<PostEntity> {
     const { image: imageInDto, ...dataWithoutImage } = data;
 
     return this.prismaService.post
       .update({ data: dataWithoutImage, where: { id } })
       .then(async post => {
+        const image = files?.image?.[0];
+
         if (imageInDto === 'null') {
           await this.prismaService.post.update({
             where: { id: post.id },
@@ -78,10 +82,10 @@ export class PostService {
           return post;
         }
 
-        if (avatar) {
-          const filename = `${Routes.Posts}/${uuid()}${path.extname(avatar.originalname)}`;
+        if (image) {
+          const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
 
-          this.supabaseService.upload(avatar, filename).then(async response => {
+          this.supabaseService.upload(image, filename).then(async response => {
             if (response.file.filename) {
               await this.prismaService.post.update({
                 where: { id: post.id },

@@ -44,7 +44,7 @@ export class UserRegistrationMethodController {
 
   @Put(':id')
   public async update(
-    @Param('id') id: UserRegistrationMethodEntity['id'],
+    @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],
     @Body() updateUserRegistrationMethodDto: UpdateUserRegistrationMethodDto,
   ): Promise<UserRegistrationMethodEntity> {
     return this.userRegistrationMethodService.update(id, updateUserRegistrationMethodDto);

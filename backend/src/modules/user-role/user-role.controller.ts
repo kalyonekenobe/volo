@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  Delete,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { UserRegistrationMethodEntity } from '../user-registration-method/entities/user-registration-method.entity';
 import { CreateUserRoleDto } from './DTO/create-user-role.dto';
 import { UpdateUserRoleDto } from './DTO/update-user-role.dto';
@@ -18,7 +28,7 @@ export class UserRoleController {
 
   @Get(':id')
   public async findOneById(
-    @Param('id') id: UserRoleEntity['id'],
+    @Param('id', ParseIntPipe) id: UserRoleEntity['id'],
     @Query() query?: string,
   ): Promise<UserRoleEntity> {
     return this.userRoleService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
@@ -31,7 +41,7 @@ export class UserRoleController {
 
   @Put(':id')
   public async update(
-    @Param('id') id: UserRegistrationMethodEntity['id'],
+    @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],
     @Body() updateUserRoleDto: UpdateUserRoleDto,
   ): Promise<UserRoleEntity> {
     return this.userRoleService.update(id, updateUserRoleDto);
@@ -39,7 +49,7 @@ export class UserRoleController {
 
   @Delete(':id')
   public async remove(
-    @Param('id') id: UserRegistrationMethodEntity['id'],
+    @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],
   ): Promise<UserRoleEntity> {
     return this.userRoleService.remove(id);
   }

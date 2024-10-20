@@ -56,15 +56,17 @@ export class UpdateUserDto
 
   @IsDate()
   @MinDate(new Date(new Date().setFullYear(new Date().getFullYear() - 6)))
-  @ValidateIf((_, value) => value)
   @Type(() => Date)
+  @ValidateIf((_, value) => value)
   birthDate?: Date | null;
 
   @IsInt()
+  @Type(() => Number)
   @ValidateIf((_, value) => value)
   userRegistrationMethodId?: number;
 
   @IsInt()
+  @Type(() => Number)
   @ValidateIf((_, value) => value)
   userRoleId?: number;
 
