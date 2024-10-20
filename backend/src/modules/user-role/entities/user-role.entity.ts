@@ -1,5 +1,13 @@
-import { UserRole } from "@prisma/client";
-import { IsString, IsNotEmpty, MaxLength, IsDefined, IsInt, IsDate, MaxDate } from "class-validator";
+import { UserRole } from '@prisma/client';
+import {
+  IsString,
+  IsNotEmpty,
+  MaxLength,
+  IsDefined,
+  IsInt,
+  IsDate,
+  MaxDate,
+} from 'class-validator';
 
 export class UserRoleEntity implements UserRole {
   @IsInt()

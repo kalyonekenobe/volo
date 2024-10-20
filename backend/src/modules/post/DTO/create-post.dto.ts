@@ -1,4 +1,3 @@
-import { Post } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { Type } from 'class-transformer';
 import {
@@ -9,15 +8,17 @@ import {
   IsDate,
   IsDecimal,
   IsString,
-  MaxDate,
   MaxLength,
   MinLength,
   ValidateIf,
   MinDate,
 } from 'class-validator';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
 
 export class CreatePostDto
-  implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'removedAt' | 'image'>
+  implements
+    Pick<PostEntity, 'authorId' | 'title' | 'content' | 'fundsToBeRaised'>,
+    Pick<Partial<PostEntity>, 'deadline' | 'isDraft'>
 {
   @IsUUID()
   @IsNotEmpty()
@@ -45,12 +46,11 @@ export class CreatePostDto
 
   @IsDate()
   @MinDate(new Date())
-  @ValidateIf((_, value) => value)
   @Type(() => Date)
-  deadline: Date | null;
+  @ValidateIf((_, value) => value)
+  deadline?: Date | null;
 
   @IsBoolean()
-  @IsDefined()
-  @Type(() => Boolean)
-  isDraft: boolean;
+  @ValidateIf((_, value) => value)
+  isDraft?: boolean;
 }

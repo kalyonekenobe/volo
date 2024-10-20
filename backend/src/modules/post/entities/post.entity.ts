@@ -1,4 +1,4 @@
-import { Post, PostDonation } from '@prisma/client';
+import { Post } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import {
   IsUUID,

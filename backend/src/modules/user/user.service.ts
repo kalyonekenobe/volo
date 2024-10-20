@@ -3,12 +3,13 @@ import * as path from 'path';
 import { PasswordService } from '../password/password.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './DTO/create-user.dto';
 import { v4 as uuid } from 'uuid';
-import { UserPublicEntity } from './entity/user-public.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserPublicEntity } from './entities/user-public.entity';
+import { UpdateUserDto } from './DTO/update-user.dto';
 import _ from 'lodash';
 import { Routes } from 'src/core/enums/app.enums';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,18 @@ export class UserService {
     private readonly passwordService: PasswordService,
     private readonly supabaseService: SupabaseService,
   ) {}
+
+  public async findAll(options?: Prisma.UserFindManyArgs): Promise<UserPublicEntity[]> {
+    return this.prismaService.user.findMany(
+      _.merge(options, { omit: { password: true, refreshToken: true } }),
+    );
+  }
+
+  public async findOne(options: Prisma.UserFindUniqueOrThrowArgs): Promise<UserPublicEntity> {
+    return this.prismaService.user.findFirstOrThrow(
+      _.merge(options, { omit: { password: true, refreshToken: true } }),
+    );
+  }
 
   public async create(data: CreateUserDto, avatar?: Express.Multer.File) {
     if (data.password) {
@@ -41,21 +54,9 @@ export class UserService {
             }
           });
         }
+
+        return user;
       });
-  }
-
-  public async findAll(): Promise<UserPublicEntity[]> {
-    return this.prismaService.user.findMany({
-      omit: { password: true, refreshToken: true },
-    });
-  }
-
-  public async findById(id: UserPublicEntity['id']): Promise<UserPublicEntity> {
-    return this.prismaService.user.findFirstOrThrow({
-      where: {
-        id,
-      },
-    });
   }
 
   public async update(
@@ -110,7 +111,7 @@ export class UserService {
       });
   }
 
-  public async deleteById(id: UserPublicEntity['id']): Promise<UserPublicEntity> {
+  public async remove(id: UserPublicEntity['id']): Promise<UserPublicEntity> {
     return this.prismaService.user
       .delete({
         where: { id },

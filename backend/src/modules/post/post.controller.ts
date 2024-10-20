@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Put,
@@ -13,62 +11,34 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as qs from 'qs';
 import { UploadResourceTypes } from 'src/core/constants/constants';
 import { UploadRestrictions } from 'src/core/decorators/upload-restrictions.decorator';
 import { Routes } from 'src/core/enums/app.enums';
-import { parseObjectStringValuesToPrimitives } from 'src/core/utils/url.utils';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { PostEntity } from './entity/post.entity';
+import { deserializeQueryString } from 'src/core/utils/url.utils';
+import { CreatePostDto } from './DTO/create-post.dto';
+import { UpdatePostDto } from './DTO/update-post.dto';
+import { PostEntity } from './entities/post.entity';
 import { PostService } from './post.service';
+import * as _ from 'lodash';
 
 @Controller(Routes.Posts)
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @Post()
-  @UseInterceptors(FileInterceptor('avatar'))
-  public async create(
-    @Body() dto: CreatePostDto,
-    @UploadedFile()
-    @UploadRestrictions([
-      {
-        fieldname: 'avatar',
-        minFileSize: 1,
-        maxFileSize: 1024 * 1024 * 5,
-        allowedMimeTypes: UploadResourceTypes.IMAGE,
-      },
-    ])
-    avatar?: Express.Multer.File,
-  ) {
-    return this.postService.create(dto, avatar);
-  }
-
   @Get()
-  public async findAll(@Query() query?: string) {
-    return this.postService.findAll(
-      query
-        ? parseObjectStringValuesToPrimitives(qs.parse(query, { comma: true, allowDots: true }))
-        : undefined,
-    );
+  public async findAll(@Query() query?: string): Promise<PostEntity[]> {
+    return this.postService.findAll(deserializeQueryString(query));
   }
 
   @Get(':id')
   public async findById(@Param('id') id: PostEntity['id'], @Query() query?: string) {
-    return this.postService.findById(
-      id,
-      query
-        ? parseObjectStringValuesToPrimitives(qs.parse(query, { comma: true, allowDots: true }))
-        : undefined,
-    );
+    return this.postService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
   }
 
-  @Put(':id')
+  @Post()
   @UseInterceptors(FileInterceptor('avatar'))
-  public async updateById(
-    @Body() dto: UpdatePostDto,
-    @Param('id') id: PostEntity['id'],
+  public async create(
+    @Body() createPostDto: CreatePostDto,
     @UploadedFile()
     @UploadRestrictions([
       {
@@ -79,13 +49,31 @@ export class PostController {
       },
     ])
     avatar?: Express.Multer.File,
-  ) {
-    return this.postService.updateById(id, dto, avatar);
+  ): Promise<PostEntity> {
+    return this.postService.create(createPostDto, avatar);
+  }
+
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('avatar'))
+  public async update(
+    @Param('id') id: PostEntity['id'],
+    @Body() updatePostDto: UpdatePostDto,
+    @UploadedFile()
+    @UploadRestrictions([
+      {
+        fieldname: 'avatar',
+        minFileSize: 1,
+        maxFileSize: 1024 * 1024 * 5,
+        allowedMimeTypes: UploadResourceTypes.IMAGE,
+      },
+    ])
+    avatar?: Express.Multer.File,
+  ): Promise<PostEntity> {
+    return this.postService.update(id, updatePostDto, avatar);
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteById(@Param('id') id: PostEntity['id']) {
-    return this.postService.deleteById(id);
+  public async remove(@Param('id') id: PostEntity['id']) {
+    return this.postService.remove(id);
   }
 }

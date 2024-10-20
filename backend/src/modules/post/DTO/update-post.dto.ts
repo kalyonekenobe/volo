@@ -1,10 +1,7 @@
-import { Post } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { Type } from 'class-transformer';
 import {
-  IsUUID,
   IsNotEmpty,
-  IsDefined,
   IsBoolean,
   IsDate,
   IsDecimal,
@@ -14,46 +11,49 @@ import {
   ValidateIf,
   MinDate,
 } from 'class-validator';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
 
-export class UpdatePostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'removedAt'> {
-  @IsUUID()
-  @IsNotEmpty()
-  @IsDefined()
-  authorId: string;
-
+export class UpdatePostDto
+  implements
+    Pick<
+      Partial<PostEntity>,
+      'title' | 'content' | 'fundsToBeRaised' | 'deadline' | 'image' | 'isDraft'
+    >
+{
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(100)
-  @IsDefined()
-  title: string;
+  @ValidateIf((_, value) => value)
+  title?: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(300)
-  @IsDefined()
-  content: string;
+  @ValidateIf((_, value) => value)
+  content?: string;
 
   @IsDecimal()
-  @IsDefined()
-  fundsToBeRaised: Decimal;
+  @Type(() => Decimal)
+  @ValidateIf((_, value) => value)
+  fundsToBeRaised?: Decimal;
 
   @IsDate()
   @MinDate(new Date())
-  @ValidateIf((_, value) => value)
   @Type(() => Date)
-  deadline: Date | null;
+  @ValidateIf((_, value) => value)
+  deadline?: Date | null;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(300)
   @ValidateIf((_, value) => value)
-  image: string | null;
+  image?: string | null;
 
   @IsBoolean()
-  @IsDefined()
   @Type(() => Boolean)
-  isDraft: boolean;
+  @ValidateIf((_, value) => value)
+  isDraft?: boolean;
 }

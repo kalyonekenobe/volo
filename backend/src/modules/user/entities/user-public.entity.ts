@@ -13,9 +13,9 @@ import {
   MinDate,
   ValidateIf,
 } from 'class-validator';
-import { PostEntity } from 'src/modules/post/entity/post.entity';
-import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entity/user-registration-method.entity';
-import { UserRoleEntity } from 'src/modules/user-role/entity/user-role.entity';
+import { PostEntity } from 'src/modules/post/entities/post.entity';
+import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entities/user-registration-method.entity';
+import { UserRoleEntity } from 'src/modules/user-role/entities/user-role.entity';
 
 export class UserPublicEntity implements Omit<User, 'password' | 'refreshToken'> {
   @IsUUID()
