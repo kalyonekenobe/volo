@@ -16,6 +16,8 @@ import { UserRoleEntity } from './entities/user-role.entity';
 import { UserRoleService } from './user-role.service';
 import { deserializeQueryString } from 'src/core/utils/url.utils';
 import * as _ from 'lodash';
+import { Auth } from 'src/core/decorators/auth.decorator';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 
 @Controller('user-roles')
 export class UserRoleController {
@@ -34,11 +36,13 @@ export class UserRoleController {
     return this.userRoleService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
   }
 
+  @Auth(JwtAuthGuard)
   @Post()
   public async create(@Body() createUserRoleDto: CreateUserRoleDto): Promise<UserRoleEntity> {
     return this.userRoleService.create(createUserRoleDto);
   }
 
+  @Auth(JwtAuthGuard)
   @Put(':id')
   public async update(
     @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],
@@ -47,6 +51,7 @@ export class UserRoleController {
     return this.userRoleService.update(id, updateUserRoleDto);
   }
 
+  @Auth(JwtAuthGuard)
   @Delete(':id')
   public async remove(
     @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],

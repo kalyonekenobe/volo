@@ -10,6 +10,7 @@ import { SupabaseModule } from 'src/modules/supabase/supabase.module';
 import { SupabaseModuleOptions } from 'src/modules/supabase/types/supabase.types';
 import { PostModule } from '../post/post.module';
 import { UserModule } from '../user/user.module';
+import { AuthModule } from 'src/modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { UserModule } from '../user/user.module';
       }),
       inject: [ConfigService],
     }),
+    AuthModule,
     UserModule,
     PostModule,
   ],

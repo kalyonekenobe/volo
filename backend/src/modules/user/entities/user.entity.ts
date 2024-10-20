@@ -98,7 +98,7 @@ export class UserEntity implements User {
   @ValidateIf((_, value) => value)
   updatedAt: Date;
 
-  userRegistrationMethod?: UserRegistrationMethodEntity[];
-  userRole?: UserRoleEntity[];
+  userRegistrationMethod?: UserRegistrationMethodEntity;
+  userRole?: UserRoleEntity;
   posts?: PostEntity[];
 }

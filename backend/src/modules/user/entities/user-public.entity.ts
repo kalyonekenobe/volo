@@ -88,7 +88,7 @@ export class UserPublicEntity implements Omit<User, 'password' | 'refreshToken'>
   @ValidateIf((_, value) => value)
   updatedAt: Date;
 
-  userRegistrationMethod?: UserRegistrationMethodEntity[];
-  userRole?: UserRoleEntity[];
+  userRegistrationMethod?: UserRegistrationMethodEntity;
+  userRole?: UserRoleEntity;
   posts?: PostEntity[];
 }

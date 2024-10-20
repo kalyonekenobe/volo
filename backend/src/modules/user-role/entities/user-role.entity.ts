@@ -8,6 +8,7 @@ import {
   IsDate,
   MaxDate,
 } from 'class-validator';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 export class UserRoleEntity implements UserRole {
   @IsInt()
@@ -33,4 +34,6 @@ export class UserRoleEntity implements UserRole {
   @MaxDate(new Date())
   @IsDefined()
   updatedAt: Date;
+
+  users?: UserPublicEntity[];
 }

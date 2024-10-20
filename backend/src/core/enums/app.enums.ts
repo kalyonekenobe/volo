@@ -26,11 +26,14 @@ export enum ConfigVariables {
   JwtAudience = 'JWT_AUDIENCE',
   GoogleClientId = 'GOOGLE_CLIENT_ID',
   GoogleClientSecret = 'GOOGLE_CLIENT_SECRET',
+  DiscordClientId = 'DISCORD_CLIENT_ID',
+  DiscordClientSecret = 'DISCORD_CLIENT_SECRET',
 }
 
 export enum UserRegistrationMethods {
   Credentials = 'credentials',
   Google = 'google',
+  Discord = 'discord',
 }
 
 export enum Routes {

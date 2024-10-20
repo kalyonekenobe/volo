@@ -15,6 +15,8 @@ import { UserRegistrationMethodEntity } from './entities/user-registration-metho
 import { UserRegistrationMethodService } from './user-registration-method.service';
 import { deserializeQueryString } from 'src/core/utils/url.utils';
 import * as _ from 'lodash';
+import { Auth } from 'src/core/decorators/auth.decorator';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 
 @Controller('user-registration-methods')
 export class UserRegistrationMethodController {
@@ -35,6 +37,7 @@ export class UserRegistrationMethodController {
     );
   }
 
+  @Auth(JwtAuthGuard)
   @Post()
   public async create(
     @Body() createUserRegistrationMethodDto: CreateUserRegistrationMethodDto,
@@ -42,6 +45,7 @@ export class UserRegistrationMethodController {
     return this.userRegistrationMethodService.create(createUserRegistrationMethodDto);
   }
 
+  @Auth(JwtAuthGuard)
   @Put(':id')
   public async update(
     @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],
@@ -50,6 +54,7 @@ export class UserRegistrationMethodController {
     return this.userRegistrationMethodService.update(id, updateUserRegistrationMethodDto);
   }
 
+  @Auth(JwtAuthGuard)
   @Delete(':id')
   public async remove(
     @Param('id', ParseIntPipe) id: UserRegistrationMethodEntity['id'],

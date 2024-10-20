@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -21,25 +22,33 @@ import { PostEntity } from './entities/post.entity';
 import { PostService } from './post.service';
 import * as _ from 'lodash';
 import { CreatePostRequestFiles, UpdatePostRequestFiles } from 'src/modules/post/types/post.types';
+import { AuthenticatedUser } from 'src/core/decorators/authenticated-user.decorator';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { Auth } from 'src/core/decorators/auth.decorator';
 
 @Controller(Routes.Posts)
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @Auth(JwtAuthGuard)
   @Get()
   public async findAll(@Query() query?: string): Promise<PostEntity[]> {
     return this.postService.findAll(deserializeQueryString(query));
   }
 
+  @Auth(JwtAuthGuard)
   @Get(':id')
   public async findById(@Param('id') id: PostEntity['id'], @Query() query?: string) {
     return this.postService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
   }
 
+  @Auth(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   public async create(
     @Body() createPostDto: CreatePostDto,
+    @AuthenticatedUser() authenticatedUser: UserPublicEntity,
     @UploadedFiles()
     @UploadRestrictions([
       {
@@ -51,14 +60,22 @@ export class PostController {
     ])
     files?: CreatePostRequestFiles,
   ): Promise<PostEntity> {
+    if (authenticatedUser.id !== createPostDto.authorId) {
+      throw new ForbiddenException(
+        'This action is forbiden for user. Author id must be equal to the authenticated user id',
+      );
+    }
+
     return this.postService.create(createPostDto, files);
   }
 
+  @Auth(JwtAuthGuard)
   @Put(':id')
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   public async update(
     @Param('id') id: PostEntity['id'],
     @Body() updatePostDto: UpdatePostDto,
+    @AuthenticatedUser() authenticatedUser: UserPublicEntity,
     @UploadedFiles()
     @UploadRestrictions([
       {
@@ -70,11 +87,31 @@ export class PostController {
     ])
     files?: UpdatePostRequestFiles,
   ): Promise<PostEntity> {
+    const post = await this.postService.findOne({ where: { id } });
+
+    if (post.authorId !== authenticatedUser.id) {
+      throw new ForbiddenException(
+        'This action is forbiden for user. Author id must be equal to the authenticated user id',
+      );
+    }
+
     return this.postService.update(id, updatePostDto, files);
   }
 
+  @Auth(JwtAuthGuard)
   @Delete(':id')
-  public async remove(@Param('id') id: PostEntity['id']) {
+  public async remove(
+    @Param('id') id: PostEntity['id'],
+    @AuthenticatedUser() authenticatedUser: UserPublicEntity,
+  ): Promise<PostEntity> {
+    const post = await this.postService.findOne({ where: { id } });
+
+    if (post.authorId !== authenticatedUser.id) {
+      throw new ForbiddenException(
+        'This action is forbiden for user. Author id must be equal to the authenticated user id',
+      );
+    }
+
     return this.postService.remove(id);
   }
 }

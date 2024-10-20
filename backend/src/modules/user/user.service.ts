@@ -29,7 +29,7 @@ export class UserService {
     );
   }
 
-  public async findOne(options: Prisma.UserFindUniqueOrThrowArgs): Promise<UserPublicEntity> {
+  public async findOne(options: Prisma.UserFindFirstOrThrowArgs): Promise<UserPublicEntity> {
     return this.prismaService.user.findFirstOrThrow(
       _.merge(options, { omit: { password: true, refreshToken: true } }),
     );
