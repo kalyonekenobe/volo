@@ -1,36 +1,22 @@
-import { FC, useEffect, useState } from 'react';
-import { useUserStorage } from '../../hooks/user.hooks';
+import { FC } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AppRoutes } from '../../consts/app.consts';
+import LoginPage from '../../pages/LoginPage';
+import RegistrationPage from '../../pages/RegistrationPage';
+import UserListPage from '../../pages/UserListPage';
+import AppTemplate from '../../templates/AppTemplate';
 
 const App: FC = () => {
-  const { users, fetchAllUsers, createUser, setUsersInStorage } = useUserStorage();
-  const [isPageLoaded, setIsPageLoaded] = useState(false);
-
-  // Once component did mount
-  useEffect(() => {
-    if (isPageLoaded) {
-      fetchAllUsers();
-
-      // Once component did unmount
-      return () => {
-        // Clear users from the storage
-        setUsersInStorage([]);
-      };
-    }
-
-    setIsPageLoaded(true);
-  }, [isPageLoaded, fetchAllUsers]);
-
   return (
-    <div>
-      {users.map((user, index) => (
-        <span className='text-xl text-red-500' key={index}>
-          {user.firstName} {user.lastName}
-        </span>
-      ))}
-      <button onClick={() => createUser({ firstName: 'Boba', lastName: 'Havryliuk' })}>
-        Add Boba Havryliuk
-      </button>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route Component={AppTemplate}>
+          <Route Component={LoginPage} path={AppRoutes.Login} />
+          <Route Component={RegistrationPage} path={AppRoutes.Registration} />
+          <Route index path={AppRoutes.Root} Component={UserListPage} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 };
 
