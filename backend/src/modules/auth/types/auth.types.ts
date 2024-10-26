@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 
 export interface LoginResponse extends Omit<User, 'password'> {
   accessToken: string;
@@ -23,7 +23,7 @@ export interface JwtTokensPairResponse {
 }
 
 export interface JwtTokenPayload {
-  userId: string;
+  userId: User['id'];
   iat: number;
   exp: number;
   [key: string]: any;
@@ -38,5 +38,9 @@ export interface OAuth2Payload {
 }
 
 export interface GenerateGoogleOAuth2Response {
+  token: string;
+}
+
+export interface GenerateDiscordOAuth2Response {
   token: string;
 }

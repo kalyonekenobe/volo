@@ -9,6 +9,7 @@ import {
   MaxDate,
 } from 'class-validator';
 import { UserRegistrationMethod } from '@prisma/client';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 export class UserRegistrationMethodEntity implements UserRegistrationMethod {
   @IsInt()
@@ -31,4 +32,6 @@ export class UserRegistrationMethodEntity implements UserRegistrationMethod {
   @MaxDate(new Date())
   @IsDefined()
   updatedAt: Date;
+
+  users?: UserPublicEntity[];
 }

@@ -5,11 +5,12 @@ import { v4 as uuid } from 'uuid';
 import { Routes } from 'src/core/enums/app.enums';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { PostEntity } from './entity/post.entity';
+import { CreatePostDto } from './DTO/create-post.dto';
+import { UpdatePostDto } from './DTO/update-post.dto';
+import { PostEntity } from './entities/post.entity';
 import * as path from 'path';
 import { Prisma } from '@prisma/client';
+import { CreatePostRequestFiles, UpdatePostRequestFiles } from 'src/modules/post/types/post.types';
 
 @Injectable()
 export class PostService {
@@ -18,13 +19,31 @@ export class PostService {
     private readonly supabaseService: SupabaseService,
   ) {}
 
-  public async create(data: CreatePostDto, avatar?: Express.Multer.File): Promise<PostEntity> {
-    return this.prismaService.post.create({ data }).then(post => {
-      (post as PostEntity).currentlyRaisedFunds = new Decimal(0);
-      if (avatar) {
-        const filename = `${Routes.Posts}/${uuid()}${path.extname(avatar.originalname)}`;
+  public async findAll(options?: Prisma.PostFindManyArgs): Promise<PostEntity[]> {
+    if (options) {
+      return this.prismaService.post
+        .findMany(options)
+        .then(posts => Promise.all(posts.map(post => this.calculateRaisedFundsForPost(post))));
+    }
 
-        this.supabaseService.upload(avatar, filename).then(async response => {
+    return this.prismaService.post
+      .findMany()
+      .then(posts => Promise.all(posts.map(post => this.calculateRaisedFundsForPost(post))));
+  }
+
+  public async findOne(options: Prisma.PostFindUniqueOrThrowArgs): Promise<PostEntity> {
+    return this.prismaService.post
+      .findUniqueOrThrow(options)
+      .then(post => this.calculateRaisedFundsForPost(post));
+  }
+
+  public async create(data: CreatePostDto, files?: CreatePostRequestFiles): Promise<PostEntity> {
+    return this.prismaService.post.create({ data }).then(post => {
+      if (files?.image?.length) {
+        const image = files?.image[0];
+        const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
+
+        this.supabaseService.upload(image, filename).then(async response => {
           if (response.file.filename) {
             await this.prismaService.post.update({
               where: { id: post.id },
@@ -38,47 +57,20 @@ export class PostService {
     });
   }
 
-  public async findAll(options?: Prisma.PostFindManyArgs) {
-    const postsPromise =
-      Object.entries(options ?? {}).length > 0
-        ? this.prismaService.post.findMany(options)
-        : this.prismaService.post.findMany();
-    return postsPromise.then(async posts => {
-      return await Promise.all(
-        posts.map(async post => {
-          const postWithCurrentFunds = await this.calculateRaisedFundsForPost(post);
-          return postWithCurrentFunds;
-        }),
-      );
-    });
-  }
-
-  public async findById(
-    id: PostEntity['id'],
-    options?: Omit<Prisma.PostFindUniqueOrThrowArgs, 'where'>,
-  ): Promise<PostEntity> {
-    return this.prismaService.post
-      .findUniqueOrThrow(_.merge(options, { where: { id } }))
-      .then(post => this.calculateRaisedFundsForPost(post));
-  }
-
-  public async updateById(
+  public async update(
     id: PostEntity['id'],
     data: UpdatePostDto,
-    avatar?: Express.Multer.File,
+    files?: UpdatePostRequestFiles,
   ): Promise<PostEntity> {
     const { image: imageInDto, ...dataWithoutImage } = data;
 
     return this.prismaService.post
-      .update({
-        data,
-        where: {
-          id,
-        },
-      })
+      .update({ data: dataWithoutImage, where: { id } })
       .then(async post => {
+        const image = files?.image?.[0];
+
         if (imageInDto === 'null') {
-          await this.prismaService.user.update({
+          await this.prismaService.post.update({
             where: { id: post.id },
             data: { image: null },
           });
@@ -90,10 +82,10 @@ export class PostService {
           return post;
         }
 
-        if (avatar) {
-          const filename = `${Routes.Posts}/${uuid()}${path.extname(avatar.originalname)}`;
+        if (image) {
+          const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
 
-          this.supabaseService.upload(avatar, filename).then(async response => {
+          this.supabaseService.upload(image, filename).then(async response => {
             if (response.file.filename) {
               await this.prismaService.post.update({
                 where: { id: post.id },
@@ -112,35 +104,19 @@ export class PostService {
       .then(post => this.calculateRaisedFundsForPost(post));
   }
 
-  public async deleteById(id: PostEntity['id']): Promise<PostEntity> {
-    return this.prismaService.post
-      .delete({
-        where: {
-          id,
-        },
-      })
-      .then(post => {
-        if (post.image) {
-          this.supabaseService.remove([post.image]);
-        }
+  public async remove(id: PostEntity['id']): Promise<PostEntity> {
+    return this.prismaService.post.delete({ where: { id } }).then(post => {
+      if (post.image) {
+        this.supabaseService.remove([post.image]);
+      }
 
-        return post;
-      });
+      return post;
+    });
   }
 
   private async calculateRaisedFundsForPost(post: PostEntity): Promise<PostEntity> {
     return this.prismaService.postDonation
-      .aggregate({
-        _sum: {
-          donation: true,
-        },
-        where: {
-          postId: post.id,
-        },
-      })
-      .then(funds => {
-        post.currentlyRaisedFunds = funds._sum.donation ?? new Decimal(0);
-        return post;
-      });
+      .aggregate({ _sum: { donation: true }, where: { postId: post.id } })
+      .then(funds => ({ ...post, fundsToBeRaised: funds._sum.donation || new Decimal(0) }));
   }
 }
