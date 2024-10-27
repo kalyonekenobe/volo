@@ -43,6 +43,7 @@ export class AuthService {
       configService.get<string>(ConfigVariables.GoogleClientSecret),
       `${configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/google`,
     );
+    console.log(`${configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/google`)
   }
 
   public async validateUser(

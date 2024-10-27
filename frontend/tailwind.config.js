@@ -1,13 +1,19 @@
 /** @type {import('tailwindcss').Config} */
+import defaultTheme from 'tailwindcss/defaultTheme';
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Montserrat', ...(defaultTheme.fontFamily.serif ?? [])],
+        mont: ['Montserrat', ...(defaultTheme.fontFamily.serif ?? [])],
         noto: ['Noto Sans', ...(defaultTheme.fontFamily.serif ?? [])],
       },
       colors: {
+        green: {
+          primary: '#538C87',
+          secondary: '#EBFFFD',
+        },
         dark: {
           primary: '#2B1B12',
           secondary: '#444444',

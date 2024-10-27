@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router';
-//import cookies from 'js-cookie';
+import cookies from 'js-cookie';
 import { api } from '../../config/api.config';
-//import { ApplicationRoutes } from '../../utils/app.utils';
+import { AppRoutes } from '../../consts/app.consts';
 
 export interface AuthProtectedRouteState {
   isLoaded: boolean;
@@ -22,14 +22,14 @@ const AuthProtectedRoute: FC = () => {
     } else {
       const request = async () => {
         try {
-          await api.get('/user', {
+          await api.get('auth/user', {
             headers: {
-            //  Authorization: `${cookies.get(import.meta.env.VITE_COOKIE_ACCESS_TOKEN_NAME)}`,
+              Authorization: `${cookies.get(import.meta.env.VITE_COOKIE_ACCESS_TOKEN_NAME)}`,
             },
           });
         } catch (error) {
-          //cookies.remove(import.meta.env.VITE_COOKIE_ACCESS_TOKEN_NAME);
-          //navigate(ApplicationRoutes.SignIn);
+          cookies.remove(import.meta.env.VITE_COOKIE_ACCESS_TOKEN_NAME);
+          navigate(AppRoutes.Login);
         }
       };
 

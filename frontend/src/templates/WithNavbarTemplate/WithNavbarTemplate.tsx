@@ -1,9 +1,10 @@
 import { Outlet } from "react-router";
 
 const WithNavbarTemplate = () => {
+  // todo: make navbar and insert it here
   return (
     <>
-      Navb
+      Navbar
       <Outlet />
     </>
   );

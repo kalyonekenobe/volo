@@ -8,6 +8,7 @@ import {
   ValidateIf,
   IsDate,
   MinDate,
+  MaxDate,
   IsInt,
   Min,
 } from 'class-validator';
@@ -44,7 +45,8 @@ export class CreateUserDto
 
   @Type(() => Date)
   @IsDate()
-  @MinDate(new Date(new Date().setFullYear(new Date().getFullYear() - 6)))
+  @MaxDate(new Date(new Date().setFullYear(new Date().getFullYear() - 6)))
+  @MinDate(new Date(new Date(1930, 1, 1).setHours(0, 0, 0, 0)))
   @ValidateIf((_, value) => value)
   birthDate?: Date | null;
 

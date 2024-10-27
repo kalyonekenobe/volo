@@ -36,6 +36,11 @@ export enum UserRegistrationMethods {
   Discord = 'discord',
 }
 
+export enum UserRoles {
+  User = 'user',
+  Admin = 'Admin',
+}
+
 export enum Routes {
   Users = 'users',
   UserRegistrationMethods = 'user-registration-methods',
