@@ -3,7 +3,6 @@ import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
 const WithNavbarAndFooterTemplate = () => {
-  // todo: make navbar and insert it here
   return (
     <>
       <Navbar />

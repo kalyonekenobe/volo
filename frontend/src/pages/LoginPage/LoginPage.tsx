@@ -24,6 +24,7 @@ const LoginPage: FC = () => {
 
     api
       .post('auth/login/credentials', formInput)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(_ => navigate(AppRoutes.Root))
       .catch(error => {
         setError('root.globalError', {
@@ -70,7 +71,7 @@ const LoginPage: FC = () => {
                     required: 'Email value should not be empty!',
                     pattern: {
                       value:
-                        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                       message: 'Email value has incorrect format!',
                     },
                   })}
@@ -128,7 +129,7 @@ const LoginPage: FC = () => {
               </div>
             </div>
             <div className='mt-6'>
-              <GoogleOAuthButton isLogin  setError={setError} />
+              <GoogleOAuthButton isLogin setError={setError} />
               <div className='mt-3'>
                 <DiscordOAuthButton isLogin setError={setError} />
               </div>

@@ -8,4 +8,5 @@ export enum AppRoutes {
     Docs = '/docs',
     Contact = '/contact',
     UsersList = '/users-list',
+    PostsList = '/posts-list'
   }

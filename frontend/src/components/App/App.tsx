@@ -6,7 +6,8 @@ import RegistrationPage from '../../pages/RegistrationPage';
 import AppTemplate from '../../templates/AppTemplate';
 import AuthProtectedRouteTemplate from '../../templates/AuthProtectedRouteTemplate';
 import WithNavbarAndFooterTemplate from '../../templates/WithNavbarAndFooterTemplate';
-import MainPage from '../../pages/MainPage/MainPage';
+import MainPage from '../../pages/MainPage';
+import PostsListPage from '../../pages/PostsListPage';
 
 const App: FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: FC = () => {
           <Route Component={RegistrationPage} path={AppRoutes.Registration} />
           <Route Component={WithNavbarAndFooterTemplate}>
             <Route index path={AppRoutes.Root} Component={MainPage} />
+            <Route index path={AppRoutes.PostsList} Component={PostsListPage} />
             <Route Component={AuthProtectedRouteTemplate}></Route>
           </Route>
         </Route>

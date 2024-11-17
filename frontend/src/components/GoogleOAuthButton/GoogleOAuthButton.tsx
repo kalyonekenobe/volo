@@ -16,7 +16,7 @@ const GoogleOAuthButton: FC<GoogleOAuthButtonProps> = ({ isLogin, setError }) =>
 
     api
       .post('oauth2/google', {
-        referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${AppRoutes.Login}`,
+        referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${AppRoutes.Root}`,
       })
       .then(({ data }) => window.location.replace(data?.url || AppRoutes.Root))
       .catch(error =>
