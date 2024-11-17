@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router';
-import cookies from 'js-cookie';
 import { api } from '../../config/api.config';
 import { AppRoutes } from '../../consts/app.consts';
+import { useUserStorage } from '../../hooks/user.hooks';
 
 export interface AuthProtectedRouteState {
   isLoaded: boolean;
@@ -14,6 +14,7 @@ const initialState: AuthProtectedRouteState = {
 
 const AuthProtectedRoute: FC = () => {
   const [state, setState] = useState(initialState);
+  const { setAuthenticatedUserInStorage } = useUserStorage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,13 +23,10 @@ const AuthProtectedRoute: FC = () => {
     } else {
       const request = async () => {
         try {
-          await api.get('auth/user', {
-            headers: {
-              Authorization: `${cookies.get(import.meta.env.VITE_COOKIE_ACCESS_TOKEN_NAME)}`,
-            },
-          });
-        } catch (error) {
-          cookies.remove(import.meta.env.VITE_COOKIE_ACCESS_TOKEN_NAME);
+          const response = await api.get('auth/user');
+          setAuthenticatedUserInStorage(response.data);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error: unknown) {
           navigate(AppRoutes.Login);
         }
       };

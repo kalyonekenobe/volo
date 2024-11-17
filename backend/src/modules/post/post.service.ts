@@ -22,7 +22,12 @@ export class PostService {
   public async findAll(options?: Prisma.PostFindManyArgs): Promise<PostEntity[]> {
     if (options) {
       return this.prismaService.post
-        .findMany(options)
+        .findMany({
+          include: {
+            author: true,
+          },
+          ...options,
+        })
         .then(posts => Promise.all(posts.map(post => this.calculateRaisedFundsForPost(post))));
     }
 
