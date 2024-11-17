@@ -1,16 +1,19 @@
 import { Decimal } from '@prisma/client/runtime/library';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsUUID,
   IsNotEmpty,
   IsDefined,
   IsBoolean,
   IsDate,
-  IsDecimal,
   IsString,
   ValidateIf,
   MinDate,
+  Validate,
+  IsDecimal,
 } from 'class-validator';
+import { DecimalMin } from 'src/core/decorators/decimal-min.decorator';
+import { CreateCategoryToPostDto } from 'src/modules/category-to-post/DTO/create-category-to-post.dto';
 import { PostEntity } from 'src/modules/post/entities/post.entity';
 
 export class CreatePostDto
@@ -33,9 +36,11 @@ export class CreatePostDto
   @IsDefined()
   content: string;
 
+  @Transform(value => new Decimal(value.value))
+  @Validate(DecimalMin, [0.01])
   @IsDecimal()
   @IsDefined()
-  @Type(() => Decimal)
+  @Transform(value => value.value.toString())
   fundsToBeRaised: Decimal;
 
   @IsDate()
@@ -52,4 +57,7 @@ export class CreatePostDto
   @IsNotEmpty()
   @ValidateIf((_, value) => value)
   image?: string | null;
+
+  @ValidateIf((_, value) => value)
+  categories?: Pick<CreateCategoryToPostDto, 'categoryId'>[];
 }

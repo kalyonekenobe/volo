@@ -84,12 +84,12 @@ model Post {
 }
 
 model PostDonation {
-  id        String    @id @default(uuid()) @db.Uuid
-  postId    String    @db.Uuid
-  donation  Decimal   @db.Money
-  metadata  Json      @default("{}")
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  removedAt DateTime? @db.Timestamptz(6)
+  id        String   @id @default(uuid()) @db.Uuid
+  postId    String   @db.Uuid
+  donation  Decimal  @db.Money
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 

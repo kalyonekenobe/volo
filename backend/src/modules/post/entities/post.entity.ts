@@ -1,5 +1,6 @@
 import { Post } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
+import { Type } from 'class-transformer';
 import {
   IsUUID,
   IsNotEmpty,
@@ -7,13 +8,14 @@ import {
   IsString,
   MaxLength,
   MinLength,
-  IsDecimal,
   IsDate,
   MaxDate,
   ValidateIf,
   IsBoolean,
   MinDate,
 } from 'class-validator';
+import { CategoryToPostEntity } from 'src/modules/category-to-post/entities/category-to-post.entity';
+import { PostDonationEntity } from 'src/modules/post-donation/entities/post-donation.entity';
 import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 export class PostEntity implements Post {
@@ -41,7 +43,7 @@ export class PostEntity implements Post {
   @IsDefined()
   content: string;
 
-  @IsDecimal()
+  @Type(() => Decimal)
   @IsDefined()
   fundsToBeRaised: Decimal;
 
@@ -74,9 +76,13 @@ export class PostEntity implements Post {
   @ValidateIf((_, value) => value)
   removedAt: Date | null;
 
-  @IsDecimal()
+  @Type(() => Decimal)
   @IsDefined()
   currentlyRaisedFunds?: Decimal;
 
   author?: UserPublicEntity;
+
+  categories?: CategoryToPostEntity[];
+
+  donations?: PostDonationEntity[];
 }

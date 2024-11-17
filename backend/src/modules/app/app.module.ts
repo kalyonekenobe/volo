@@ -11,6 +11,8 @@ import { SupabaseModuleOptions } from 'src/modules/supabase/types/supabase.types
 import { PostModule } from '../post/post.module';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
+import { StripeModule } from 'src/modules/stripe/stripe.module';
+import { StripeModuleOptions } from 'src/modules/stripe/types/stripe.types';
 
 @Module({
   imports: [
@@ -52,11 +54,16 @@ import { AuthModule } from 'src/modules/auth/auth.module';
       }),
       inject: [ConfigService],
     }),
+    StripeModule.registerAsync({
+      useFactory: async (configService: ConfigService): Promise<StripeModuleOptions> => ({
+        stripeApiKey: configService.get<string>(ConfigVariables.StripeSecretKey) || '',
+        options: { apiVersion: '2024-10-28.acacia' },
+      }),
+      inject: [ConfigService],
+    }),
     AuthModule,
     UserModule,
     PostModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

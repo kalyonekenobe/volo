@@ -38,23 +38,37 @@ export class PostService {
   }
 
   public async create(data: CreatePostDto, files?: CreatePostRequestFiles): Promise<PostEntity> {
-    return this.prismaService.post.create({ data }).then(post => {
-      if (files?.image?.length) {
-        const image = files?.image[0];
-        const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
+    const { categories, ...dataWithoutCategories } = data;
 
-        this.supabaseService.upload(image, filename).then(async response => {
-          if (response.file.filename) {
-            await this.prismaService.post.update({
-              where: { id: post.id },
-              data: { image: response.file.filename },
-            });
-          }
-        });
-      }
+    return this.prismaService.post
+      .create({
+        data: {
+          ...dataWithoutCategories,
+          categoriesToPosts: {
+            createMany: {
+              data: categories || [],
+              skipDuplicates: false,
+            },
+          },
+        },
+      })
+      .then(post => {
+        if (files?.image?.length) {
+          const image = files?.image[0];
+          const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
 
-      return post;
-    });
+          this.supabaseService.upload(image, filename).then(async response => {
+            if (response.file.filename) {
+              await this.prismaService.post.update({
+                where: { id: post.id },
+                data: { image: response.file.filename },
+              });
+            }
+          });
+        }
+
+        return post;
+      });
   }
 
   public async update(
@@ -62,10 +76,22 @@ export class PostService {
     data: UpdatePostDto,
     files?: UpdatePostRequestFiles,
   ): Promise<PostEntity> {
-    const { image: imageInDto, ...dataWithoutImage } = data;
+    const { image: imageInDto, categories, ...dataWithoutImageAndCategories } = data;
 
     return this.prismaService.post
-      .update({ data: dataWithoutImage, where: { id } })
+      .update({
+        data: {
+          ...dataWithoutImageAndCategories,
+          categoriesToPosts: {
+            deleteMany: {},
+            createMany: {
+              data: categories ?? [],
+              skipDuplicates: true,
+            },
+          },
+        },
+        where: { id },
+      })
       .then(async post => {
         const image = files?.image?.[0];
 
@@ -117,6 +143,6 @@ export class PostService {
   private async calculateRaisedFundsForPost(post: PostEntity): Promise<PostEntity> {
     return this.prismaService.postDonation
       .aggregate({ _sum: { donation: true }, where: { postId: post.id } })
-      .then(funds => ({ ...post, fundsToBeRaised: funds._sum.donation || new Decimal(0) }));
+      .then(funds => ({ ...post, currentlyRaisedFunds: funds._sum.donation || new Decimal(0) }));
   }
 }

@@ -28,6 +28,8 @@ export enum ConfigVariables {
   GoogleClientSecret = 'GOOGLE_CLIENT_SECRET',
   DiscordClientId = 'DISCORD_CLIENT_ID',
   DiscordClientSecret = 'DISCORD_CLIENT_SECRET',
+  StripePublicKey = 'STRIPE_PUBLIC_KEY',
+  StripeSecretKey = 'STRIPE_SECRET_KEY',
 }
 
 export enum UserRegistrationMethods {
@@ -38,7 +40,7 @@ export enum UserRegistrationMethods {
 
 export enum UserRoles {
   User = 'user',
-  Admin = 'Admin',
+  Admin = 'admin',
 }
 
 export enum Routes {
@@ -48,4 +50,8 @@ export enum Routes {
   Auth = 'auth',
   OAuth2 = 'oauth2',
   Posts = 'posts',
+  CategoriesToPosts = 'posts/:id/categories',
+  PostCategories = 'post-categories',
+  PostDonations = 'post-donations',
+  Payments = 'payments',
 }

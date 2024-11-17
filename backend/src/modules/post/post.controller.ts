@@ -26,15 +26,26 @@ import { AuthenticatedUser } from 'src/core/decorators/authenticated-user.decora
 import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { Auth } from 'src/core/decorators/auth.decorator';
+import { PostDonationService } from 'src/modules/post-donation/post-donation.service';
+import { CreatePostDonationDto } from 'src/modules/post-donation/DTO/create-post-donation.dto';
+import { PostDonationEntity } from 'src/modules/post-donation/entities/post-donation.entity';
 
 @Controller(Routes.Posts)
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly postDonationService: PostDonationService,
+  ) {}
 
   @Auth(JwtAuthGuard)
   @Get()
   public async findAll(@Query() query?: string): Promise<PostEntity[]> {
     return this.postService.findAll(deserializeQueryString(query));
+  }
+
+  @Get(':id/donations')
+  public async findAllPostDonations(@Param('id') id: string): Promise<PostDonationEntity[]> {
+    return this.postDonationService.findAllForPost(id);
   }
 
   @Auth(JwtAuthGuard)
@@ -67,6 +78,14 @@ export class PostController {
     }
 
     return this.postService.create(createPostDto, files);
+  }
+
+  @Post(':id/donations')
+  public async createDonation(
+    @Param('id') id: PostEntity['id'],
+    @Body() createPostDonationDto: CreatePostDonationDto,
+  ): Promise<PostDonationEntity> {
+    return this.postDonationService.create(id, createPostDonationDto);
   }
 
   @Auth(JwtAuthGuard)
