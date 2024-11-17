@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default ({ mode }: any) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+  process.env = { ...process.env, ...loadEnv(mode, `${process.cwd()}/env`) };
 
   // https://vitejs.dev/config/
   return defineConfig({

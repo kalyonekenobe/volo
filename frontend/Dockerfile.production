@@ -24,10 +24,12 @@ RUN pnpm prune || npm prune
 USER node
 
 # Production stage 
-FROM gcr.io/distroless/nodejs22-debian12 AS production
+FROM base AS production
 WORKDIR /app
 
 ENV NODE_ENV production
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 ARG VITE_FRONTEND_PORT
 ARG VITE_BACKEND_URI
@@ -63,6 +65,6 @@ COPY --chown=node:node --from=build /app/package.json /app/pnpm-lock.yaml ./
 COPY --chown=node:node --from=build /app/node_modules ./node_modules
 COPY --chown=node:node --from=build /app/dist ./dist
 
-CMD ["dist/main.js"]
+CMD ["pnpm", "run", "preview"]
 
 EXPOSE 3000
