@@ -10,6 +10,7 @@ import MainPage from '../../pages/MainPage';
 import PostsListPage from '../../pages/PostsListPage';
 import UsersListPage from '../../pages/UsersListPage';
 import PostCreatePage from '../../pages/PostCreatePage';
+import SinglePostImage from '../../pages/SinglePostPage/SinglePostPage';
 
 const App: FC = () => {
   return (
@@ -20,10 +21,11 @@ const App: FC = () => {
           <Route Component={RegistrationPage} path={AppRoutes.Registration} />
           <Route Component={RegistrationPage} path={AppRoutes.Registration} />
           <Route Component={WithNavbarAndFooterTemplate}>
-          <Route index path={AppRoutes.PostsCreate} Component={PostCreatePage} />
             <Route Component={AuthProtectedRouteTemplate}>
+              <Route index path={AppRoutes.PostsCreate} Component={PostCreatePage} />
               <Route index path={AppRoutes.Root} Component={MainPage} />
               <Route index path={AppRoutes.PostsList} Component={PostsListPage} />
+              <Route index path={AppRoutes.PostsList + '/:id'} Component={SinglePostImage} />
               <Route index path={AppRoutes.UsersList} Component={UsersListPage} />
             </Route>
           </Route>

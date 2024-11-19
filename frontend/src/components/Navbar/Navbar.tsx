@@ -28,7 +28,7 @@ const Navbar: FC = () => {
           </div>
         </Link>
       </div>
-      <nav className='flex gap-6 sm:gap-10'>
+      <nav className='gap-6 sm:gap-10 md:flex hidden'>
         <Link
           className='text font-medium hover:underline underline-offset-4 decoration-blue-500'
           to={AppRoutes.PostsList}

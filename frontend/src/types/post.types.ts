@@ -6,7 +6,7 @@ export interface Post {
   title: string;
   content: string;
   fundsToBeRaised: number;
-  deadline: Date | null;
+  deadline: Date;
   image: string | null;
   isDraft: boolean;
   createdAt: Date;
@@ -21,7 +21,7 @@ export interface CreatePostDto {
   title: string;
   content: string;
   fundsToBeRaised: number;
-  deadline?: Date | null;
-  isDraft?: boolean;
-  image?: string | null;
+  deadline: Date;
+  isDraft: boolean;
+  file?: File | null;
 }

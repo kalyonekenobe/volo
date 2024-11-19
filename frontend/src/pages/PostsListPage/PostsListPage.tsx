@@ -95,8 +95,22 @@ const PostsListPage: FC = () => {
             <div key={post.id} className='bg-white justify-center shadow rounded max-w-[650px]'>
               <div className='flex flex-col justify-between h-full'>
                 <div className='pl-5 pr-5 pt-5'>
-                  <div className='w-full bg-blue-500 flex justify-center items-center rounded-lg h-[280px]'>
-                    <p className='font-bold text-3xl text-white'>Volo</p>
+                  <div className='w-full h-[280px]'>
+                    {!post.image && (
+                    <div className='bg-blue-500 w-full h-full flex justify-center items-center rounded-lg'>
+                      <p className='font-bold text-3xl text-white'>Volo</p>
+                    </div>
+                  )}
+                  {post.image && (
+                    <div className='w-full h-full'>
+                      <img
+                        className='w-full h-full object-cover rounded-lg'
+                        src={post.image}
+                        alt='post image preview'
+                      />
+                    </div>
+                  )}
+
                   </div>
                   <div className='flex flex-col justify-between gap-5 mt-2'>
                     <p className='text-xl font-bold'>{post.title}</p>
@@ -176,7 +190,7 @@ const PostsListPage: FC = () => {
                     </svg>
                     <p className='w-auto'>Like</p>
                   </div>
-                  <div className='flex justify-center items-center text-gray-500 p-2 gap-1 hover:bg-gray-100 transition-all duration-300 cursor-pointer'>
+                  <div onClick={() => navigate(`${AppRoutes.PostsList}/${post.id}`)} className='flex justify-center items-center text-gray-500 p-2 gap-1 hover:bg-gray-100 transition-all duration-300 cursor-pointer'>
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
                       fill='none'

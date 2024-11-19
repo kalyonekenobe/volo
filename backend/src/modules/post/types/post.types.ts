@@ -1,5 +1,5 @@
 export interface CreatePostRequestFiles {
-  image?: Express.Multer.File[];
+  file?: Express.Multer.File[];
 }
 
 export interface UpdatePostRequestFiles {

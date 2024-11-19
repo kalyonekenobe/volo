@@ -1,10 +1,10 @@
 import { useAtom } from 'jotai';
-import { fetchAllPostsAtom, postsAtom  } from '../storage/post.storage';
+import { fetchAllPostsAtom, fetchSinglePostAtom, postsAtom } from '../storage/post.storage';
 
 export const usePostStorage = () => {
   const [posts, fetchAllPosts] = useAtom(fetchAllPostsAtom);
-  //const [_createUser, createUser] = useAtom(createUserAtom);
-  const [_posts, setPostsInStorage] = useAtom(postsAtom);
+  const [, setPostsInStorage] = useAtom(postsAtom);
+  const [post, fetchSinglePost] = useAtom(fetchSinglePostAtom);
 
-  return { posts, fetchAllPosts, setPostsInStorage };
+  return { posts, fetchAllPosts, setPostsInStorage, post, fetchSinglePost };
 };

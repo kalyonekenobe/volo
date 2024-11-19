@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { AppRoutes } from '../../consts/app.consts';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -14,6 +14,8 @@ import {
 } from '../../types/user.types';
 import GoogleOAuthButton from '../../components/GoogleOAuthButton';
 import DiscordOAuthButton from '../../components/DiscordOAuthButton';
+import cookies from 'js-cookie';
+import * as jose from 'jose';
 
 const RegistrationPage: FC = () => {
   const navigate = useNavigate();
@@ -59,7 +61,7 @@ const RegistrationPage: FC = () => {
         formInput.userRegistrationMethodId = userRegistrationMethodId;
         formInput.userRoleId = userRoleId;
 
-        return api.post('auth/register', formInput).then(data => navigate(AppRoutes.Root));
+        return api.post('auth/register', formInput).then(_ => navigate(AppRoutes.Root));
       })
       .catch(error => {
         setError('root.globalError', {
@@ -67,6 +69,37 @@ const RegistrationPage: FC = () => {
         });
       });
   };
+
+  useEffect(() => {
+    const oauth2TokenCookieName = import.meta.env.VITE_COOKIE_OAUTH2_TOKEN_NAME;
+    const oauth2ProviderCookieName = import.meta.env.VITE_COOKIE_OAUTH2_PROVIDER_NAME;
+
+    const oauth2TokenCookieValue = cookies.get(oauth2TokenCookieName);
+    const oauth2ProviderCookieValue = cookies.get(oauth2ProviderCookieName);
+
+    if (oauth2TokenCookieValue) {
+      const payload = jose.decodeJwt(oauth2TokenCookieValue);
+      const { accessToken } = payload;
+      if (!oauth2ProviderCookieValue || !accessToken) {
+        setError('root.globalError', {
+          message: 'Failed authentication with OAuth2',
+        });
+        return;
+      }
+
+      api
+        .post(`auth/login/${oauth2ProviderCookieValue}`, {
+          [`${(oauth2ProviderCookieValue as string).toLowerCase()}AccessToken`]: accessToken,
+        })
+        .then(() => {
+          navigate(AppRoutes.Root);
+        })
+        .finally(() => {
+          cookies.remove(oauth2TokenCookieName);
+          cookies.remove(oauth2ProviderCookieName);
+        });
+    }
+  }, []);
 
   return (
     <div className='flex flex-column lg:flex-row justify-center'>

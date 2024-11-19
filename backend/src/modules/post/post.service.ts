@@ -38,7 +38,12 @@ export class PostService {
 
   public async findOne(options: Prisma.PostFindUniqueOrThrowArgs): Promise<PostEntity> {
     return this.prismaService.post
-      .findUniqueOrThrow(options)
+      .findUniqueOrThrow({
+        include: {
+          author: true,
+        },
+        ...options,
+      })
       .then(post => this.calculateRaisedFundsForPost(post));
   }
 
@@ -58,8 +63,8 @@ export class PostService {
         },
       })
       .then(post => {
-        if (files?.image?.length) {
-          const image = files?.image[0];
+        if (files?.file?.length) {
+          const image = files?.file[0];
           const filename = `${Routes.Posts}/${uuid()}${path.extname(image.originalname)}`;
 
           this.supabaseService.upload(image, filename).then(async response => {
