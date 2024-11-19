@@ -19,7 +19,7 @@ const DiscordOAuthButton: FC<DiscordOAuthButtonProps> = ({ isLogin, setError }) 
     cookies.set(import.meta.env.VITE_COOKIE_OAUTH2_PROVIDER_NAME, UserRegistrationMethods.Discord);
     api
       .post('oauth2/discord', {
-        referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${AppRoutes.Login}`,
+        referer: `${import.meta.env.VITE_FRONTEND_URI}${AppRoutes.Login}`,
       })
       .then(({ data }) => window.location.replace(data?.url || AppRoutes.Root))
       .catch(error =>

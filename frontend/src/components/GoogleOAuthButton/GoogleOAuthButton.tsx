@@ -19,7 +19,7 @@ const GoogleOAuthButton: FC<GoogleOAuthButtonProps> = ({ isLogin, setError }) =>
     cookies.set(import.meta.env.VITE_COOKIE_OAUTH2_PROVIDER_NAME, UserRegistrationMethods.Google);
     api
       .post('oauth2/google', {
-        referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${isLogin ? AppRoutes.Login : AppRoutes.Registration}`,
+        referer: `${import.meta.env.VITE_FRONTEND_URI}${isLogin ? AppRoutes.Login : AppRoutes.Registration}`,
       })
       .then(({ data }) => window.location.replace(data?.url || AppRoutes.Root))
       .catch(error =>

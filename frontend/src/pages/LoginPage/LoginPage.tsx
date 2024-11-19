@@ -43,8 +43,8 @@ const LoginPage: FC = () => {
     const oauth2TokenCookieName = import.meta.env.VITE_COOKIE_OAUTH2_TOKEN_NAME;
     const oauth2ProviderCookieName = import.meta.env.VITE_COOKIE_OAUTH2_PROVIDER_NAME;
 
-    const oauth2TokenCookieValue = cookies.get(oauth2TokenCookieName);
-    const oauth2ProviderCookieValue = cookies.get(oauth2ProviderCookieName);
+    const oauth2TokenCookieValue = cookies.get(oauth2TokenCookieName, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/' });
+    const oauth2ProviderCookieValue = cookies.get(oauth2ProviderCookieName, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/' });
 
     if (oauth2TokenCookieValue) {
       const payload = jose.decodeJwt(oauth2TokenCookieValue);
@@ -64,8 +64,8 @@ const LoginPage: FC = () => {
           navigate(AppRoutes.Root);
         })
         .finally(() => {
-          cookies.remove(oauth2TokenCookieName);
-          cookies.remove(oauth2ProviderCookieName);
+          cookies.remove(oauth2TokenCookieName, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/' });
+          cookies.remove(oauth2ProviderCookieName, { domain: import.meta.env.VITE_COOKIE_DOMAIN, path: '/' });
         });
     }
   }, []);
