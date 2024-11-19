@@ -2,6 +2,8 @@ import { isArray } from 'lodash';
 import { FC } from 'react';
 import { api } from '../../config/api.config';
 import { AppRoutes } from '../../consts/app.consts';
+import cookies from 'js-cookie';
+import { UserRegistrationMethods } from '../../types/user.types';
 
 interface GoogleOAuthButtonProps {
   isLogin?: boolean;
@@ -14,9 +16,10 @@ const GoogleOAuthButton: FC<GoogleOAuthButtonProps> = ({ isLogin, setError }) =>
       message: '',
     });
 
+    cookies.set(import.meta.env.VITE_COOKIE_OAUTH2_PROVIDER_NAME, UserRegistrationMethods.Google);
     api
       .post('oauth2/google', {
-        referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${AppRoutes.Login}`,
+        referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${isLogin ? AppRoutes.Login : AppRoutes.Registration}`,
       })
       .then(({ data }) => window.location.replace(data?.url || AppRoutes.Root))
       .catch(error =>

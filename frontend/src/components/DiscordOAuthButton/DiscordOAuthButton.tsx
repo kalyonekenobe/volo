@@ -2,6 +2,8 @@ import { isArray } from 'lodash';
 import { FC } from 'react';
 import { api } from '../../config/api.config';
 import { AppRoutes } from '../../consts/app.consts';
+import { UserRegistrationMethods } from '../../types/user.types';
+import cookies from 'js-cookie';
 
 interface DiscordOAuthButtonProps {
   isLogin?: boolean;
@@ -14,6 +16,7 @@ const DiscordOAuthButton: FC<DiscordOAuthButtonProps> = ({ isLogin, setError }) 
       message: '',
     });
 
+    cookies.set(import.meta.env.VITE_COOKIE_OAUTH2_PROVIDER_NAME, UserRegistrationMethods.Discord);
     api
       .post('oauth2/discord', {
         referer: `${import.meta.env.VITE_FRONTEND_URI}:${import.meta.env.VITE_FRONTEND_PORT}${AppRoutes.Login}`,

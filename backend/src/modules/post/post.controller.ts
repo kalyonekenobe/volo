@@ -56,14 +56,14 @@ export class PostController {
 
   @Auth(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 1 }]))
   public async create(
     @Body() createPostDto: CreatePostDto,
     @AuthenticatedUser() authenticatedUser: UserPublicEntity,
     @UploadedFiles()
     @UploadRestrictions([
       {
-        fieldname: 'image',
+        fieldname: 'file',
         minFileSize: 1,
         maxFileSize: 1024 * 1024 * 5,
         allowedMimeTypes: UploadResourceTypes.IMAGE,

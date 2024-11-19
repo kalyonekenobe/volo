@@ -1,6 +1,38 @@
+import { Post } from './post.types';
+
 export interface User {
-  firstName: string;
-  lastName: string;
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  birthDate: Date | null;
+  phone: string | null;
+  bio: string | null;
+  image: string | null;
+  userRegistrationMethodId: number;
+  userRoleId: number;
+  stripeCustomerId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userRegistrationMethod?: UserRegistrationMethod;
+  userRole?: UserRole;
+  posts?: Post[];
+}
+
+export interface UserRegistrationMethod {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  users?: User[];
+}
+
+export interface UserRole {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  users?: User[];
 }
 
 export interface CreateUserDto {
@@ -23,7 +55,6 @@ export interface UserRegistrationMethodDto {
   updatedAt: Date;
 }
 
-
 export enum UserRegistrationMethods {
   Credentials = 'credentials',
   Google = 'google',
@@ -31,6 +62,6 @@ export enum UserRegistrationMethods {
 }
 
 export enum UserRoles {
-  User = 'user',
+  User = 'User',
   Admin = 'Admin',
 }
