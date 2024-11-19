@@ -25,7 +25,10 @@ export class UserService {
 
   public async findAll(options?: Prisma.UserFindManyArgs): Promise<UserPublicEntity[]> {
     return this.prismaService.user.findMany(
-      _.merge(options, { omit: { password: true, refreshToken: true } }),
+      _.merge(options, {
+        omit: { password: true, refreshToken: true },
+        include: { userRole: true },
+      }),
     );
   }
 

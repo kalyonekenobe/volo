@@ -7,7 +7,7 @@ import { Auth, google } from 'googleapis';
 import { ConfigService } from '@nestjs/config';
 import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 import { AuthException } from 'src/core/exceptions/auth.exception';
-import { ConfigVariables, UserRegistrationMethods } from 'src/core/enums/app.enums';
+import { ConfigVariables, UserRegistrationMethods, UserRoles } from 'src/core/enums/app.enums';
 import { CreateUserDto } from 'src/modules/user/DTO/create-user.dto';
 import {
   GenerateDiscordOAuth2Response,
@@ -43,7 +43,7 @@ export class AuthService {
       configService.get<string>(ConfigVariables.GoogleClientSecret),
       `${configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/google`,
     );
-    console.log(`${configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/google`)
+    console.log(`${configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/google`);
   }
 
   public async validateUser(
@@ -138,9 +138,29 @@ export class AuthService {
   public async loginWithGoogle(loginWithGoogleDto: LoginWithGoogleDto): Promise<LoginResponse> {
     try {
       const { googleAccessToken } = loginWithGoogleDto;
-      const { email } = await this.googleOAuth2Client.getTokenInfo(googleAccessToken);
+      const tokenInfo = await this.googleOAuth2Client.getTokenInfo(googleAccessToken);
+      const { email } = tokenInfo;
+      let user = await this.userService.findOne({ where: { email } });
 
-      const user = await this.userService.findOne({ where: { email } });
+      if (!user) {
+        const userRegistrationMethod = await this.prismaService.userRegistrationMethod.findFirst({
+          where: {
+            name: UserRegistrationMethods.Google,
+          },
+        });
+        const userRole = await this.prismaService.userRole.findFirst({
+          where: {
+            name: UserRoles.User,
+          },
+        });
+
+        user = await this.userService.create({
+          email: email!,
+          userRegistrationMethodId: userRegistrationMethod!.id,
+          userRoleId: userRole!.id,
+          firstName: email!.split('@')[0],
+        });
+      }
 
       const { accessToken, refreshToken } = await this.generateJwtTokensPair(user);
 
@@ -168,14 +188,30 @@ export class AuthService {
         throw new AuthException('Cannot fetch the Discord user info with provided access token');
       }
 
-      const { email } = response.data;
-      const user = await this.userService.findOne({
+      const { email, username } = response.data;
+      let user = await this.userService.findOne({
         where: { email },
         include: { userRegistrationMethod: true },
       });
 
-      if (user.userRegistrationMethod?.name !== UserRegistrationMethods.Discord) {
-        throw new AuthException('There are not any users with such email registered with Discord');
+      if (!user) {
+        const userRegistrationMethod = await this.prismaService.userRegistrationMethod.findFirst({
+          where: {
+            name: UserRegistrationMethods.Discord,
+          },
+        });
+        const userRole = await this.prismaService.userRole.findFirst({
+          where: {
+            name: UserRoles.User,
+          },
+        });
+
+        user = await this.userService.create({
+          email,
+          userRegistrationMethodId: userRegistrationMethod!.id,
+          userRoleId: userRole!.id,
+          firstName: username,
+        });
       }
 
       const { accessToken, refreshToken } = await this.generateJwtTokensPair(user);
@@ -280,7 +316,7 @@ export class AuthService {
     const state = JSON.stringify(payload);
     const redirectUri = `${this.configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/discord`;
 
-    return `https://discord.com/oauth2/authorize?response_type=code&client_id=${clientId}&scope=identify&state=${state}&redirect_uri=${redirectUri}&prompt=consent`;
+    return `https://discord.com/oauth2/authorize?response_type=code&client_id=${clientId}&scope=email%20identify&state=${state}&redirect_uri=${redirectUri}&prompt=consent`;
   }
 
   public async generateDiscordOAuth2Token(

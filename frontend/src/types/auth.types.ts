@@ -16,4 +16,3 @@ export interface RegistrationFormDto {
 export interface OAuthResponseDto {
   url: string;
 }
-

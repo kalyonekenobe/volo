@@ -51,6 +51,7 @@ export class CreatePostDto
 
   @IsBoolean()
   @ValidateIf((_, value) => value)
+  @Type(() => Boolean)
   isDraft?: boolean;
 
   @IsString()

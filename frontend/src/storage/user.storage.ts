@@ -1,33 +1,32 @@
 import { atom } from 'jotai';
-import { CreateUserDto, User } from '../types/user.types';
+import { User } from '../types/user.types';
+import { api } from '../config/api.config';
 
-export const usersAtom = atom<User[]>([{ firstName: 'John', lastName: 'Doe' }]);
+export const authenticatedUserAtom = atom<User>({});
+export const usersAtom = atom<User[]>([{}]);
 
 export const fetchAllUsersAtom = atom(
   get => get(usersAtom),
   async (get, set) => {
     try {
-      // TODO: send request to the backend
-      // Example: const response = await api.post('users', data);
-      // set(usersAtom, [...get(usersAtom), response.data]);
-
-      // Just for test
-      set(usersAtom, get(usersAtom));
-    } catch (error: any) {
+      const response = await api.get('users');
+      console.log(response.data)
+      set(usersAtom, [...get(usersAtom), ...response.data]);
+    } catch (error: unknown) {
       console.log(error);
     }
   },
 );
 
-export const createUserAtom = atom(null, async (get, set, data: CreateUserDto) => {
-  try {
-    // TODO: send request to the backend
-    // Example: const response = await api.post('users', data);
-    // set(usersAtom, [...get(usersAtom), response.data]);
+export const logoutUserAtom = atom(
+  get => get(authenticatedUserAtom),
+  async (_, set) => {
+    try {
+      await api.post('auth/logout');
+      set(authenticatedUserAtom, {});
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  },
+);
 
-    // Just for test
-    set(usersAtom, [...get(usersAtom), data]);
-  } catch (error: any) {
-    console.log(error);
-  }
-});
