@@ -62,6 +62,6 @@ export enum UserRegistrationMethods {
 }
 
 export enum UserRoles {
-  User = 'User',
-  Admin = 'Admin',
+  User = 'user',
+  Admin = 'admin',
 }
