@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserRegistrationMethodDto } from './DTO/create-user-registration-method.dto';
 import { UpdateUserRegistrationMethodDto } from './DTO/update-user-registration-method.dto';
@@ -7,24 +7,8 @@ import { Prisma } from '@prisma/client';
 import { UserRegistrationMethods } from 'src/core/enums/app.enums';
 
 @Injectable()
-export class UserRegistrationMethodService implements OnModuleInit {
+export class UserRegistrationMethodService {
   constructor(private readonly prismaService: PrismaService) {}
-
-  public async onModuleInit(): Promise<void> {
-    const initialRegistrationMethods: CreateUserRegistrationMethodDto[] = Object.values(
-      UserRegistrationMethods,
-    ).map(method => ({ name: method }));
-    initialRegistrationMethods.forEach(async method => {
-      const methodFromDb = await this.prismaService.userRegistrationMethod.findFirst({
-        where: {
-          name: method.name,
-        },
-      });
-      if (!methodFromDb) {
-        await this.prismaService.userRegistrationMethod.create({ data: method });
-      }
-    });
-  }
 
   public async findAll(
     options?: Prisma.UserRegistrationMethodFindManyArgs,

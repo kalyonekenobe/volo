@@ -140,7 +140,7 @@ export class AuthService {
       const { googleAccessToken } = loginWithGoogleDto;
       const tokenInfo = await this.googleOAuth2Client.getTokenInfo(googleAccessToken);
       const { email } = tokenInfo;
-      let user = await this.userService.findOne({ where: { email } });
+      let user = await this.prismaService.user.findFirst({ where: { email }, omit: { refreshToken: true, password: true } });
 
       if (!user) {
         const userRegistrationMethod = await this.prismaService.userRegistrationMethod.findFirst({
@@ -161,7 +161,11 @@ export class AuthService {
           firstName: email!.split('@')[0],
         });
       }
-
+      
+      if (!user) {
+        throw new AuthException('Cannot authorize the user. Invalid credentials were provided');
+      }
+      
       const { accessToken, refreshToken } = await this.generateJwtTokensPair(user);
 
       await this.userService.update(user.id, { refreshToken });
