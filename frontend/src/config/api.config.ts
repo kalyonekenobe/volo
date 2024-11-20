@@ -1,7 +1,7 @@
 import axios, { HttpStatusCode } from 'axios';
 
 export const getBackendUrl = () => {
-  const backendUri = import.meta.env.VITE_BACKEND_URI || 'http://localhost';
+  const backendUri = import.meta.env.VITE_BACKEND_URI || 'http://localhost:8080';
   const backendApiPrefix = import.meta.env.VITE_BACKEND_PREFIX || 'api/v1/';
 
   return `${backendUri}/${backendApiPrefix}`;

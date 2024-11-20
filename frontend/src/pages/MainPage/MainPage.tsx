@@ -24,7 +24,7 @@ const MainPage: FC = () => {
             </div>
           </div>
         </section>
-        <section className='flex justify-center w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800'>
+        <section className='flex justify-center w-full py-12 md:py-24 lg:py-32 bg-gray-100'>
           <div className='container px-4 md:px-6'>
             <h2 className='text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12'>
               Why Choose Volo?
@@ -33,28 +33,28 @@ const MainPage: FC = () => {
               <div className='flex flex-col items-center space-y-3 text-center'>
                 <Globe className='h-12 w-12 text-blue-500' />
                 <h3 className='text-xl font-bold'>Global Reach</h3>
-                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                <p className='text-sm text-gray-500'>
                   Connect with donors worldwide and amplify your impact.
                 </p>
               </div>
               <div className='flex flex-col items-center space-y-3 text-center'>
                 <Users className='h-12 w-12 text-blue-500' />
                 <h3 className='text-xl font-bold'>Easy Collaboration</h3>
-                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                <p className='text-sm text-gray-500'>
                   Work together with your team to manage campaigns efficiently.
                 </p>
               </div>
               <div className='flex flex-col items-center space-y-3 text-center'>
                 <Shield className='h-12 w-12 text-blue-500' />
                 <h3 className='text-xl font-bold'>Secure Donations</h3>
-                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                <p className='text-sm text-gray-500'>
                   Ensure safe and transparent transactions for all contributors.
                 </p>
               </div>
               <div className='flex flex-col items-center space-y-3 text-center'>
                 <Heart className='h-12 w-12 text-blue-500' />
                 <h3 className='text-xl font-bold'>Impactful Results</h3>
-                <p className='text-sm text-gray-500 dark:text-gray-400'>
+                <p className='text-sm text-gray-500'>
                   Track your progress and showcase the difference you're making.
                 </p>
               </div>

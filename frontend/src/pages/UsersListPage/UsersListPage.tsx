@@ -2,6 +2,7 @@ import { FC, useEffect } from 'react';
 import unknownUser from './../../static/unknownUser.jpg';
 import { useUserStorage } from '../../hooks/user.hooks';
 import { UserRoles } from '../../types/user.types';
+import { formatUserName } from '../../config/user.name';
 
 const UsersListPage: FC = () => {
   const { users, fetchAllUsers, setUsersInStorage } = useUserStorage();
@@ -26,7 +27,9 @@ const UsersListPage: FC = () => {
                 alt='user image'
               />
             </div>
-            <p className='mt-6 text-center font-semibold'>{user.firstName + ' ' + user.lastName}</p>
+            <p className='mt-6 text-center font-semibold'>
+              {formatUserName(user.firstName, user.lastName)}
+            </p>
             <p
               className={`capitalize mt-1 px-2.5 py-0.5 rounded-xl text-center text-xs ${user.userRole?.name.toLocaleLowerCase() === UserRoles.Admin.toLowerCase() ? 'bg-blue-500 text-white' : 'border border-blue-500'}`}
             >

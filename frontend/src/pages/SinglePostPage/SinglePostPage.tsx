@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { usePostStorage } from '../../hooks/post.hooks';
 import { useEffect } from 'react';
 import { AppRoutes } from '../../consts/app.consts';
+import { formatUserName } from '../../config/user.name';
 
 const SinglePostPage = () => {
   const { id } = useParams();
@@ -92,7 +93,7 @@ const SinglePostPage = () => {
                     <div className='flex flex-col'>
                       <Link to={''}>
                         <p className='text-sm blue-text-with-decoration'>
-                          {post.author?.firstName + ' ' + post.author?.lastName}
+                          {formatUserName(post.author?.firstName, post.author?.lastName)}
                         </p>
                       </Link>
                       <p className='text-sm text-gray-500'>
@@ -125,19 +126,19 @@ const SinglePostPage = () => {
 
                 <div className='mt-12'>
                   <div className='flex justify-between items-center mb-6'>
-                    <h2 className='text-base lg:text-2xl font-bold text-gray-900 dark:text-white'>
+                    <h2 className='text-base lg:text-2xl font-bold text-gray-900'>
                       Discussion (20)
                     </h2>
                   </div>
                   <form className='mb-6'>
-                    <div className='py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700'>
+                    <div className='py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200'>
                       <label htmlFor='comment' className='sr-only'>
                         Your comment
                       </label>
                       <textarea
                         id='comment'
                         rows={6}
-                        className='px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800'
+                        className='px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none'
                         placeholder='Write a comment...'
                         required
                       ></textarea>
