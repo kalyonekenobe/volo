@@ -33,7 +33,7 @@ const PaymentFormContent: FC<PaymentFormProps> = forwardRef(
         if (!stripe || !elements) return;
         const response = await stripe?.confirmPayment({ elements, redirect: 'if_required' });
         console.log(response)
-        post.currentlyRaisedFunds += response.paymentIntent!.amount!;
+        post.currentlyRaisedFunds += response.paymentIntent!.amount! / 100;
         onSubmit(response);
       } catch (error) {
         console.log(error);
