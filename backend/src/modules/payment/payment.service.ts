@@ -33,8 +33,16 @@ export class PaymentService {
 
   public async charge(payload: ChargeDto): Promise<PaymentChargeResponse> {
     try {
+      console.log({
+        amount: payload.amount,
+        currency: process.env.STRIPE_CURRENCY || 'USD',
+        customer: payload.customerId,
+        payment_method: payload.paymentMethodId,
+        automatic_payment_methods: { enabled: false },
+        payment_method_types: ['card'],
+      })
       const paymentIntent = await this.stripeService.stripe.paymentIntents.create({
-        amount: payload.amount * 100,
+        amount: payload.amount,
         currency: process.env.STRIPE_CURRENCY || 'USD',
         customer: payload.customerId,
         payment_method: payload.paymentMethodId,

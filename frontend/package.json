@@ -13,6 +13,8 @@
     "preview": "vite preview --port=${VITE_FRONTEND_PORT} --host"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^3.0.0",
+    "@stripe/stripe-js": "^5.2.0",
     "@supabase/supabase-js": "^2.46.1",
     "axios": "^1.7.7",
     "jose": "^5.9.3",

@@ -4,22 +4,34 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AppRoutes } from '../../consts/app.consts';
 import { usePostStorage } from '../../hooks/post.hooks';
 import { useUserStorage } from '../../hooks/user.hooks';
-import { Post } from '../../types/post.types';
 import { formatUserName } from '../../config/user.name';
+import { Post } from '../../types/post.types';
+import { createPortal } from 'react-dom';
+import PaymentModal from '../../components/Payment/PaymentModal';
 
 const PostsListPage: FC = () => {
   const navigate = useNavigate();
-  const initialState = { posts: [] };
-  const [state, setState] = useState<{ posts: Post[] }>(initialState);
+  const initialState = { searchField: '', isPaymentModalVisible: false, postForDonate: {} };
+  const [state, setState] = useState<{
+    searchField: string;
+    isPaymentModalVisible: boolean;
+    postForDonate: Post;
+  }>(initialState);
   const { posts, fetchAllPosts, setPostsInStorage, isFetchingPostsList } = usePostStorage();
   const { users, fetchAllUsers, setUsersInStorage } = useUserStorage();
+
   const countFundsPercentage = (currentSum: number, requiredSum: number) =>
     (currentSum / requiredSum) * 100;
+  const searchPosts = (posts: Post[]): Post[] =>
+    posts.filter(post =>
+      state.searchField
+        ? post.title.toLowerCase().startsWith(state.searchField.toLowerCase().trim())
+        : true,
+    );
 
   useEffect(() => {
     fetchAllPosts();
     fetchAllUsers();
-    setState({ posts });
 
     return () => {
       setPostsInStorage([]);
@@ -66,11 +78,12 @@ const PostsListPage: FC = () => {
                 id='simple-search'
                 className='text-input'
                 placeholder='Search post by name...'
-                required
+                value={state.searchField}
+                onChange={event => setState({ ...state, searchField: event.target.value })}
               />
             </div>
             <button
-              type='submit'
+              onClick={event => event.preventDefault()}
               className='ms-2 h-full bg-blue-500 text-white border rounded-lg px-3 py-2 text-base hover:bg-blue-400 hover:cursor-pointer focus:ring-1 focus:outline-none focus:ring-blue-200 transition-all duration-300'
             >
               <svg
@@ -121,7 +134,7 @@ const PostsListPage: FC = () => {
           </div>
         ) : (
           <div className='mt-4 grid lg:grid-cols-2 gap-6'>
-            {state.posts.map(post => (
+            {searchPosts(posts).map(post => (
               <div key={post.id} className='bg-white justify-center shadow rounded max-w-[650px]'>
                 <div className='flex flex-col justify-between h-full'>
                   <div className='pl-5 pr-5 pt-5'>
@@ -186,7 +199,7 @@ const PostsListPage: FC = () => {
                                     )) + '%',
                             }}
                           >
-                            {countFundsPercentage(post.currentlyRaisedFunds, post.fundsToBeRaised)}%
+                            {Math.round(countFundsPercentage(post.currentlyRaisedFunds, post.fundsToBeRaised) * 100) / 100}%
                           </div>
                         </div>
                         <div className='flex justify-between'>
@@ -239,7 +252,16 @@ const PostsListPage: FC = () => {
                       </svg>
                       <p className='w-auto'>Read more</p>
                     </div>
-                    <div className='flex justify-center items-center text-gray-500 p-2 gap-1 hover:bg-gray-100 transition-all duration-300 cursor-pointer'>
+                    <div
+                      onClick={() => {
+                        setState({
+                          ...state,
+                          isPaymentModalVisible: true,
+                          postForDonate: post,
+                        });
+                      }}
+                      className='flex justify-center items-center text-gray-500 p-2 gap-1 hover:bg-gray-100 transition-all duration-300 cursor-pointer'
+                    >
                       <svg
                         xmlns='http://www.w3.org/2000/svg'
                         fill='none'
@@ -264,6 +286,23 @@ const PostsListPage: FC = () => {
           </div>
         )}
       </main>
+      {state.isPaymentModalVisible &&
+        createPortal(
+          <PaymentModal
+            post={state.postForDonate}
+            title={'Make a donation'}
+            onClose={() => {
+              setPostsInStorage(posts.map(post => {
+                if (post.id === state.postForDonate.id) {
+                  post.currentlyRaisedFunds = state.postForDonate.currentlyRaisedFunds;
+                }
+                return post;
+              }))
+              setState({ ...state, isPaymentModalVisible: false, postForDonate: {} });
+            }}
+          />,
+          document.querySelector('body')!,
+        )}
     </div>
   );
 };

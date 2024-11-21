@@ -1,4 +1,6 @@
 import { FC } from 'react';
+import {Elements} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppRoutes } from '../../consts/app.consts';
 import LoginPage from '../../pages/LoginPage';
@@ -12,7 +14,11 @@ import UsersListPage from '../../pages/UsersListPage';
 import PostCreatePage from '../../pages/PostCreatePage';
 import SinglePostImage from '../../pages/SinglePostPage/SinglePostPage';
 
+//const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
 const App: FC = () => {
+ 
+
   return (
     <BrowserRouter>
       <Routes>

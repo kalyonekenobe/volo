@@ -4,6 +4,7 @@ import {
   fetchSinglePostAtom,
   postsAtom,
   isFetchingPostsListAtom,
+  isFetchingSinglePostAtom,
 } from '../storage/post.storage';
 
 export const usePostStorage = () => {
@@ -11,6 +12,7 @@ export const usePostStorage = () => {
   const [, setPostsInStorage] = useAtom(postsAtom);
   const [post, fetchSinglePost] = useAtom(fetchSinglePostAtom);
   const [isFetchingPostsList] = useAtom(isFetchingPostsListAtom);
+  const [isFetchingSinglePost] = useAtom(isFetchingSinglePostAtom);
 
-  return { posts, fetchAllPosts, setPostsInStorage, post, fetchSinglePost, isFetchingPostsList };
+  return { posts, fetchAllPosts, setPostsInStorage, post, fetchSinglePost, isFetchingPostsList, isFetchingSinglePost };
 };

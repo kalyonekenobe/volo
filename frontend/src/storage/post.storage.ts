@@ -5,6 +5,7 @@ import { getImageSignedUrl } from '../config/supabase.config';
 
 export const postsAtom = atom<Post[]>([]);
 export const isFetchingPostsListAtom = atom<boolean>(true);
+export const isFetchingSinglePostAtom = atom<boolean>(true);
 export const singlePostAtom = atom<Post>({
   createdAt: new Date(),
   deadline: new Date(),
@@ -32,9 +33,11 @@ export const fetchAllPostsAtom = atom(
 export const fetchSinglePostAtom = atom(
   get => get(singlePostAtom),
   async (_, set, id) => {
+    set(isFetchingSinglePostAtom, true);
     const response = await api.get(`posts/${id}`);
     const post = response.data;
     post.image = await getImageSignedUrl(post.image);
     set(singlePostAtom, post);
+    set(isFetchingSinglePostAtom, false);
   },
 );
