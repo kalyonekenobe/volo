@@ -70,7 +70,7 @@ const PaymentModal: FC<PaymentModalProps> = ({ post, children, onClose, ...props
   const handleSubmit = async (result: PaymentIntentResult) => {
     const response = await donate(
       post.id,
-      result?.paymentIntent?.amount || 10 / 100,
+      (result?.paymentIntent?.amount || 0) / 100,
       JSON.stringify(result.paymentIntent),
     );
 

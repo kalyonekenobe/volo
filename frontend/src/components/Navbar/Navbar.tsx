@@ -4,6 +4,7 @@ import { AppRoutes } from '../../consts/app.consts';
 import logo from './../../static/logo.png';
 import { useUserStorage } from '../../hooks/user.hooks';
 import unknownUser from './../../static/unknownUser.jpg';
+import { formatUserName } from '../../config/user.name';
 
 interface NavbarState {
   userWindowOpened: boolean;
@@ -60,7 +61,7 @@ const Navbar: FC = () => {
         <div className='h-5 w-5'>
           <img className='object-cover rounded-full' src={unknownUser} alt='user image' />
         </div>
-        <p>{authenticatedUser.firstName + ' ' + authenticatedUser.lastName}</p>
+        <p>{formatUserName(authenticatedUser.firstName, authenticatedUser.lastName)}</p>
         {state.userWindowOpened && (
           <div className='absolute -left-6 top-full z-10 mt-3 w-screen max-w-52 overflow-hidden rounded bg-white shadow-lg ring-1 ring-gray-900/5 ransition-all hover:bg-gray-100 duration-300 cursor-pointer'>
             <div
