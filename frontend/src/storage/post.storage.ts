@@ -10,7 +10,7 @@ export const singlePostAtom = atom<Post>({
   createdAt: new Date(),
   deadline: new Date(),
   author: {},
-});
+} as any);
 
 export const fetchAllPostsAtom = atom(
   get => get(postsAtom),
@@ -37,7 +37,7 @@ export const fetchSinglePostAtom = atom(
     const response = await api.get(`posts/${id}`);
     const post = response.data;
     post.image = await getImageSignedUrl(post.image);
-    set(singlePostAtom, post);
+    set(singlePostAtom as any, post);
     set(isFetchingSinglePostAtom, false);
   },
 );

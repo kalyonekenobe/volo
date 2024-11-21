@@ -117,6 +117,8 @@ services:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_KEY: ${VITE_SUPABASE_KEY}
         VITE_SUPABASE_BUCKET: ${VITE_SUPABASE_BUCKET}
+        VITE_STRIPE_PUBLIC_KEY: ${VITE_STRIPE_PUBLIC_KEY}
+        VITE_STRIPE_SECRET_KEY: ${VITE_STRIPE_SECRET_KEY}
     container_name: volo-frontend
     networks:
       - volo-network

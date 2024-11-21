@@ -15,7 +15,7 @@ const PostCreatePage: FC = () => {
     mode: 'onSubmit',
   });
 
-  const onSubmit: SubmitHandler<CreatePostDto> = formInput => {
+  const onSubmit: SubmitHandler<CreatePostDto> = (formInput: any) => {
     setError('root.globalError', {
       message: '',
     });
@@ -23,10 +23,9 @@ const PostCreatePage: FC = () => {
     const formData = new FormData();
     Object.keys(formInput).forEach(key => formData.set(key, formInput[key as keyof CreatePostDto]));
 
-
     api
       .post('posts', formData)
-      .then(_ => navigate(AppRoutes.PostsList))
+      .then(_ => navigate(AppRoutes.Posts))
       .catch(error => {
         setError('root.globalError', {
           message:
@@ -80,8 +79,8 @@ const PostCreatePage: FC = () => {
                         accept='image/*'
                         id='post-image'
                         onChange={event => {
-                          const file = event?.target?.files[0];
-                          if (file.type.startsWith('image')) {
+                          const file = event?.target?.files?.[0];
+                          if (file?.type.startsWith('image')) {
                             setState({
                               ...state,
                               image: URL.createObjectURL(file),
@@ -114,10 +113,7 @@ const PostCreatePage: FC = () => {
                 encType='multipart/formdata'
               >
                 {formState.errors?.root?.globalError?.message && (
-                  <div
-                    className='p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50'
-                    role='alert'
-                  >
+                  <div className='p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50' role='alert'>
                     <span className='font-medium'>Error!</span>{' '}
                     {formState.errors?.root?.globalError?.message}
                   </div>
@@ -214,7 +210,7 @@ const PostCreatePage: FC = () => {
                     {...register('deadline', {
                       required: 'You should provide deadline for fundraiser!',
                       validate: {
-                        notInPast: fieldValue => {
+                        notInPast: (fieldValue: any) => {
                           return fieldValue! > new Date() || `Deadline can't be in the past!`;
                         },
                       },
@@ -233,7 +229,13 @@ const PostCreatePage: FC = () => {
                     Is Draft
                   </label>
                   <label className='inline-flex items-center cursor-pointer'>
-                    <input  {...register('isDraft')} id='isDraft' type='checkbox' value='' className='sr-only peer' />
+                    <input
+                      {...register('isDraft')}
+                      id='isDraft'
+                      type='checkbox'
+                      value=''
+                      className='sr-only peer'
+                    />
                     <div
                       className={`relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300  rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600`}
                     ></div>

@@ -11,7 +11,7 @@ import PaymentModal from '../../components/Payment/PaymentModal';
 
 const PostsListPage: FC = () => {
   const navigate = useNavigate();
-  const initialState = { searchField: '', isPaymentModalVisible: false, postForDonate: {} };
+  const initialState = { searchField: '', isPaymentModalVisible: false, postForDonate: {} as any };
   const [state, setState] = useState<{
     searchField: string;
     isPaymentModalVisible: boolean;
@@ -51,7 +51,11 @@ const PostsListPage: FC = () => {
           <h3 className='pl-2 font-semibold text-xl mt-4'>Suggestions</h3>
           <ul className='mt-4 space-y-2 font-medium'>
             {users.slice(0, 5).map(user => (
-              <li className='p-2.5 border border-gray-200 flex items-center gap-2 rounded-md hover:bg-gray-100 transition-all duration-300 cursor-pointer'>
+              <li
+                key={user.id}
+                className='p-2.5 border border-gray-200 flex items-center gap-2 rounded-md hover:bg-gray-100 transition-all duration-300 cursor-pointer'
+                onClick={() => navigate(AppRoutes.UserDetails.replace(':id', user.id))}
+              >
                 <div className='h-8 w-8'>
                   <img className='object-cover rounded-full' src={unknownUser} alt='user image' />
                 </div>
@@ -61,7 +65,7 @@ const PostsListPage: FC = () => {
               </li>
             ))}
           </ul>
-          <Link to={AppRoutes.UsersList}>
+          <Link to={AppRoutes.Users}>
             <p className='mt-4 text-sm blue-text-with-decoration'>View all users →</p>
           </Link>
         </div>
@@ -165,7 +169,7 @@ const PostsListPage: FC = () => {
                           />
                         </div>
                         <div className='flex flex-col'>
-                          <Link to={''}>
+                          <Link to={AppRoutes.UserDetails.replace(':id', post.author?.id)}>
                             <p className='text-sm blue-text-with-decoration'>
                               {formatUserName(post.author?.firstName, post.author?.lastName)}
                             </p>
@@ -199,7 +203,13 @@ const PostsListPage: FC = () => {
                                     )) + '%',
                             }}
                           >
-                            {Math.round(countFundsPercentage(post.currentlyRaisedFunds, post.fundsToBeRaised) * 100) / 100}%
+                            {Math.round(
+                              countFundsPercentage(
+                                post.currentlyRaisedFunds,
+                                post.fundsToBeRaised,
+                              ) * 100,
+                            ) / 100}
+                            %
                           </div>
                         </div>
                         <div className='flex justify-between'>
@@ -233,7 +243,7 @@ const PostsListPage: FC = () => {
                       <p className='w-auto'>Like</p>
                     </div>
                     <div
-                      onClick={() => navigate(`${AppRoutes.PostsList}/${post.id}`)}
+                      onClick={() => navigate(AppRoutes.PostDetails.replace(':id', post.id))}
                       className='flex justify-center items-center text-gray-500 p-2 gap-1 hover:bg-gray-100 transition-all duration-300 cursor-pointer'
                     >
                       <svg
@@ -292,13 +302,15 @@ const PostsListPage: FC = () => {
             post={state.postForDonate}
             title={'Make a donation'}
             onClose={() => {
-              setPostsInStorage(posts.map(post => {
-                if (post.id === state.postForDonate.id) {
-                  post.currentlyRaisedFunds = state.postForDonate.currentlyRaisedFunds;
-                }
-                return post;
-              }))
-              setState({ ...state, isPaymentModalVisible: false, postForDonate: {} });
+              setPostsInStorage(
+                posts.map(post => {
+                  if (post.id === state.postForDonate.id) {
+                    post.currentlyRaisedFunds = state.postForDonate.currentlyRaisedFunds;
+                  }
+                  return post;
+                }),
+              );
+              setState({ ...state, isPaymentModalVisible: false, postForDonate: {} as any });
             }}
           />,
           document.querySelector('body')!,

@@ -17,7 +17,7 @@ const SinglePostPage = () => {
   const { authenticatedUser } = useUserStorage();
 
   useEffect(() => {
-    fetchSinglePost(id).catch(() => navigate(AppRoutes.PostsList));
+    fetchSinglePost(id).catch(() => navigate(AppRoutes.Posts));
   }, []);
 
   return (
@@ -118,7 +118,7 @@ const SinglePostPage = () => {
                         />
                       </div>
                       <div className='flex flex-col'>
-                        <Link to={''}>
+                        <Link to={AppRoutes.UserDetails.replace(':id', post.author?.id)}>
                           <p className='text-sm blue-text-with-decoration'>
                             {formatUserName(post.author?.firstName, post.author?.lastName)}
                           </p>
@@ -156,9 +156,7 @@ const SinglePostPage = () => {
                       <div>
                         <button
                           onClick={() => {
-                            api
-                              .delete(`posts/${post.id}`)
-                              .then(() => navigate(AppRoutes.PostsList));
+                            api.delete(`posts/${post.id}`).then(() => navigate(AppRoutes.Posts));
                           }}
                           className='primary-red-button'
                         >

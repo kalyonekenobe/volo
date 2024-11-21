@@ -30,9 +30,9 @@ const App: FC = () => {
             <Route Component={AuthProtectedRouteTemplate}>
               <Route index path={AppRoutes.PostsCreate} Component={PostCreatePage} />
               <Route index path={AppRoutes.Root} Component={MainPage} />
-              <Route index path={AppRoutes.PostsList} Component={PostsListPage} />
-              <Route index path={AppRoutes.PostsList + '/:id'} Component={SinglePostImage} />
-              <Route index path={AppRoutes.UsersList} Component={UsersListPage} />
+              <Route index path={AppRoutes.Posts} Component={PostsListPage} />
+              <Route index path={AppRoutes.Posts + '/:id'} Component={SinglePostImage} />
+              <Route index path={AppRoutes.Users} Component={UsersListPage} />
             </Route>
           </Route>
         </Route>
